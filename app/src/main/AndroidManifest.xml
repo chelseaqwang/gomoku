@@ -41,6 +41,10 @@
             android:name=".statistics"
             android:label="@string/title_activity_statistics" >
         </activity>
+        <activity
+            android:name=".board"
+            android:label="@string/title_activity_board_small" >
+        </activity>
     </application>
 
 </manifest>

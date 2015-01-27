@@ -16,5 +16,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_profile">Profile</string>
     <string name="title_activity_statistics">Statistics</string>
+    <string name="title_activity_board_small">board_small</string>
 
 </resources>
