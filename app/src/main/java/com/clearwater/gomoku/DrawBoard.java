@@ -17,8 +17,6 @@ public class DrawBoard extends View {
 
     @Override
     public void onDraw(Canvas canvas) {
-        paint.setColor(Color.YELLOW);
-        canvas.drawRect(0, 0, 800, 800, paint);
         paint.setStrokeWidth(5);
         paint.setColor(Color.BLACK);
         float padding = 800/size/2;

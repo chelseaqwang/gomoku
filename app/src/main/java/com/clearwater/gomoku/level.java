@@ -13,7 +13,6 @@ public class level extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_level);
-        DrawBoard drawBoard;
 
         Button button_small = (Button)findViewById(R.id.button_small);
         button_small.setOnClickListener (

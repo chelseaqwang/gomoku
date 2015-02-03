@@ -1,6 +1,5 @@
 package com.clearwater.gomoku;
 
-import android.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,8 +10,6 @@ import android.content.Intent;
 import android.content.Context;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.RelativeLayout;
-import android.view.ViewGroup.LayoutParams;
 import android.graphics.Color;
 import android.widget.Button;
 
@@ -26,15 +23,15 @@ public class board extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_board);
+        setContentView(R.layout.activity_board);
 
         Intent intent = getIntent();
         size = intent.getIntExtra("SIZE", 10);
         piece_array = new char[size][size];
 
         drawBoard = new DrawBoard(this, size);
-        drawBoard.setBackgroundColor(Color.YELLOW);
-        setContentView(drawBoard);
+        addContentView(drawBoard,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT));
 
         drawBoard.setOnTouchListener(
                 new DrawBoard.OnTouchListener() {
@@ -71,14 +68,15 @@ public class board extends ActionBarActivity {
 
     public void play(MotionEvent m) {
 
-        int color;
-        String c;
+        String color;
+        int intColor;
         Context context = getApplicationContext();
         float x = m.getX();
         float y = m.getY();
         float grid = 800/size;
         float radius;
         int i, j;
+        TextView textView = (TextView)findViewById(R.id.winText);
 
         i = Math.round((x-grid/2)/grid);
         j = Math.round((y-grid/2)/grid);
@@ -87,83 +85,71 @@ public class board extends ActionBarActivity {
         if (piece_array[i][j] != '\0') return;
 
         round++;
-        if (round%2 == 0) {
-            color = Color.BLACK;
+        color = whichPlayer(round);
+        if (color == "Black") {
             piece_array[i][j] = 'b';
-            c = "BLACK";
+            intColor = Color.BLACK;
         } else {
-            color = Color.WHITE;
             piece_array[i][j] = 'w';
-            c = "WHITE";
+            intColor = Color.WHITE;
         }
-        System.out.println(round);
-        System.out.println(piece_array[i][j]);
 
         x = Math.round((x-grid/2)/grid)*grid + grid/2;
         y = Math.round((y-grid/2)/grid)*grid + grid/2;
         radius = (float) (grid*0.9/2);
 
-        DrawPiece drawPiece = new DrawPiece(context, x, y, radius, color);
+        DrawPiece drawPiece = new DrawPiece(context, x, y, radius, intColor);
         addContentView(drawPiece,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
 
-        if(round > 8 && checkWin(i, j, color)) {
 
-//            RelativeLayout parent = (RelativeLayout) findViewById(R.id.board);
-            TextView textView = new TextView(this);
-            textView.setText(c + " wins!");
-            textView.setTextSize(60);
-            textView.setTextColor(Color.RED);
-            RelativeLayout.LayoutParams params= new RelativeLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, parent.getId());
-            textView.setLayoutParams(params);
-//            parent.addView(textView);
-            addContentView(textView, params);
-
+        if(round > 8 && checkWin(i, j, intColor)) {
+            textView.setText(color + " wins!");
             drawBoard.setOnTouchListener(null);
-        }
 
+            Button button_play_again = (Button)findViewById(R.id.button_play_again);
+            button_play_again.setVisibility(View.VISIBLE);
+            button_play_again.setOnClickListener (
+                    new Button.OnClickListener() {
+                        public void onClick(View v) {
+                            Intent intent = new Intent(board.this, board.class);
+                            intent.putExtra("SIZE", size);
+                            startActivity(intent);
+                        }
+                    }
+            );
+        } else {
+            textView.setText(whichPlayer(round + 1) + "'s turn");
+        }
     }
 
     public boolean checkWin(int i, int j, int color) {
-
-        String five, six;
-
-        if(color == Color.BLACK) {
-            five = "bbbbb";
-            six = "bbbbbb";
-        } else {
-            five = "wwwww";
-            six = "wwwwww";
-        }
 
         StringBuffer s = new StringBuffer();
         for (int p = Math.max(i-5, 0); p < Math.min(i+6, size); p++) {
             s.append(piece_array[p][j]);
         }
-        if (s.toString().contains(five) && !s.toString().contains(six)) return true;
+        if (onlyFive(s.toString(), color)) return true;
 
         s = new StringBuffer();
         for (int q = Math.max(j-5, 0); q < Math.min(j+6, size); q++) {
             s.append(piece_array[i][q]);
         }
-        if (s.toString().contains(five) && !s.toString().contains(six)) return true;
+        if (onlyFive(s.toString(), color)) return true;
 
         s = new StringBuffer();
         for (int p = i-5, q = j-5; p < i+6; p++, q++) {
             if (!checkIndex(p, q)) continue;
             s.append(piece_array[p][q]);
         }
-
-        if (s.toString().contains(five) && !s.toString().contains(six)) return true;
+        if (onlyFive(s.toString(), color)) return true;
 
         s = new StringBuffer();
         for (int p = i-5, q = j+5; p < i+6; p++, q--) {
             if (!checkIndex(p, q)) continue;
             s.append(piece_array[p][q]);
         }
-        if (s.toString().contains(five) && !s.toString().contains(six)) return true;
+        if (onlyFive(s.toString(), color)) return true;
 
         return false;
     }
@@ -173,6 +159,34 @@ public class board extends ActionBarActivity {
             return false;
         } else {
             return true;
+        }
+    }
+
+    private boolean onlyFive(String s, int color) {
+        String five, six, seven;
+
+        if(color == Color.BLACK) {
+            five = "bbbbb";
+            six = "bbbbbb";
+            seven = "wbbbbbw";
+        } else {
+            five = "wwwww";
+            six = "wwwwww";
+            seven = "bwwwwwb";
+        }
+
+        if (s.contains(five) && !s.contains(six) && !s.contains(seven)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private String whichPlayer(int i) {
+        if (i % 2 == 0) {
+            return "Black";
+        } else {
+            return "White";
         }
     }
 
