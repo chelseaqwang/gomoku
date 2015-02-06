@@ -9,13 +9,17 @@
     <string name="button_statistics">STATISTICS</string>
     <string name="button_settings">SETTINGS</string>
     <string name="button_exit">exit</string>
-    <string name="button_level_small">small\n10*10</string>
-    <string name="button_level_medium">medium\n15*15</string>
-    <string name="button_level_large">large\n20*20</string>
+    <string name="button_size_small">10*10</string>
+    <string name="button_size_medium">15*15</string>
+    <string name="button_size_large">20*20</string>
+    <string name="button_mode_offline">Offline</string>
+    <string name="button_mode_ai">Computer</string>
+    <string name="button_mode_online">Online</string>
     <string name="title_activity_level">level</string>
     <string name="title_activity_profile">Profile</string>
     <string name="title_activity_statistics">Statistics</string>
     <string name ="title_activity_board_small">Two Players</string>
     <string name="winText">Black vs. White</string>
+    <string name="button_start">START</string>
 
 </resources>

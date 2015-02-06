@@ -26,8 +26,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".level"
-            android:label="@string/title_activity_level" >
+            android:name=".selection"
+            android:label="selection" >
         </activity>
         <activity
             android:name=".SettingsActivity"

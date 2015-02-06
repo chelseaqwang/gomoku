@@ -22,8 +22,7 @@
         android:layout_marginTop="150dp"
         android:textSize="30sp"
         android:layout_alignParentEnd="false"
-        android:clickable="false"
-        android:onClick="level" />
+        android:clickable="false" />
 
     <Button
         android:layout_width="200dp"

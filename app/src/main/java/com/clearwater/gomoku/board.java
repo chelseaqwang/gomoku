@@ -12,11 +12,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.graphics.Color;
 import android.widget.Button;
+import java.util.Random;
 
 
 public class board extends ActionBarActivity {
     DrawBoard drawBoard;
-    int size;
+    int size, mode;
     public char[][] piece_array;
     int round = 0;
 
@@ -27,21 +28,48 @@ public class board extends ActionBarActivity {
 
         Intent intent = getIntent();
         size = intent.getIntExtra("SIZE", 10);
+        mode = intent.getIntExtra("MODE", 1);
         piece_array = new char[size][size];
 
         drawBoard = new DrawBoard(this, size);
         addContentView(drawBoard,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT));
 
-        drawBoard.setOnTouchListener(
-                new DrawBoard.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent m) {
-                        play(m);
-                        return true;
-                    }
-                }
-        );
+        switch(mode) {
+            case 1:
+                drawBoard.setOnTouchListener(
+                        new DrawBoard.OnTouchListener() {
+                            @Override
+                            public boolean onTouch(View v, MotionEvent m) {
+                                offlinePlay(m);
+                                return true;
+                            }
+                        }
+                );
+                break;
+            case 2:
+                drawBoard.setOnTouchListener(
+                        new DrawBoard.OnTouchListener() {
+                            @Override
+                            public boolean onTouch(View v, MotionEvent m) {
+                                aiPlay(m);
+                                return true;
+                            }
+                        }
+                );
+                break;
+            case 3:
+                drawBoard.setOnTouchListener(
+                        new DrawBoard.OnTouchListener() {
+                            @Override
+                            public boolean onTouch(View v, MotionEvent m) {
+                                // not implemented yet
+                                return true;
+                            }
+                        }
+                );
+                break;
+        }
     }
 
     @Override
@@ -66,7 +94,7 @@ public class board extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void play(MotionEvent m) {
+    public void offlinePlay(MotionEvent m) {
 
         String color;
         int intColor;
@@ -76,12 +104,11 @@ public class board extends ActionBarActivity {
         float grid = 800/size;
         float radius;
         int i, j;
-        TextView textView = (TextView)findViewById(R.id.winText);
 
         i = Math.round((x-grid/2)/grid);
         j = Math.round((y-grid/2)/grid);
 
-        if(j >= size) return;
+        if(!checkIndex(i, j)) return;
         if (piece_array[i][j] != '\0') return;
 
         round++;
@@ -94,17 +121,74 @@ public class board extends ActionBarActivity {
             intColor = Color.WHITE;
         }
 
-        x = Math.round((x-grid/2)/grid)*grid + grid/2;
-        y = Math.round((y-grid/2)/grid)*grid + grid/2;
         radius = (float) (grid*0.9/2);
 
-        DrawPiece drawPiece = new DrawPiece(context, x, y, radius, intColor);
+        DrawPiece drawPiece =
+                new DrawPiece(context, i*grid+grid/2, j*grid+grid/2, radius, intColor);
         addContentView(drawPiece,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
 
+        display(i, j, intColor);
+    }
 
-        if(round > 8 && checkWin(i, j, intColor)) {
-            textView.setText(color + " wins!");
+    public void aiPlay(MotionEvent m) {
+        Context context = getApplicationContext();
+        float x = m.getX();
+        float y = m.getY();
+        float grid = 800/size;
+        float radius;
+        int i, j;
+
+        i = Math.round((x-grid/2)/grid);
+        j = Math.round((y-grid/2)/grid);
+
+        if(!checkIndex(i, j)) return;
+        if (piece_array[i][j] != '\0') return;
+
+        round++;
+        piece_array[i][j] = 'b';
+
+        radius = (float) (grid*0.9/2);
+        DrawPiece playerPiece =
+                new DrawPiece(context, i*grid+grid/2, j*grid+grid/2, radius, Color.BLACK);
+        addContentView(playerPiece,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        display(i, j, Color.BLACK);
+
+        int[] ai = aiMove(piece_array, Color.WHITE);
+        if(!checkIndex(ai[0], ai[1])) return;
+        if (piece_array[ai[0]][ai[1]] != '\0') return;
+        round++;
+        piece_array[ai[0]][ai[1]] = 'w';
+        radius = (float) (grid*0.9/2);
+        DrawPiece aiPiece =
+                new DrawPiece(context, ai[0]*grid+grid/2, ai[1]*grid+grid/2, radius, Color.WHITE);
+        addContentView(aiPiece,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        display(i, j, Color.WHITE);
+
+    }
+
+    public int[] aiMove(char[][] pArray, int color) {
+        int i, j;
+        do {
+            Random random = new Random();
+            i = random.nextInt(size);
+            j = random.nextInt(size);
+        } while(pArray[i][j] != '\0');
+        return new int[] {i, j};
+    }
+
+    public void display(int i, int j, int color) {
+        TextView textView = (TextView)findViewById(R.id.winText);
+        String player;
+        if (color == Color.BLACK) {
+            player = "Black";
+        } else {
+            player = "White";
+        }
+        if(round > 8 && checkWin(i, j, color)) {
+            textView.setText(player + " wins!");
             drawBoard.setOnTouchListener(null);
 
             Button button_play_again = (Button)findViewById(R.id.button_play_again);
@@ -114,6 +198,7 @@ public class board extends ActionBarActivity {
                         public void onClick(View v) {
                             Intent intent = new Intent(board.this, board.class);
                             intent.putExtra("SIZE", size);
+                            intent.putExtra("MODE", mode);
                             startActivity(intent);
                         }
                     }
@@ -121,7 +206,9 @@ public class board extends ActionBarActivity {
         } else {
             textView.setText(whichPlayer(round + 1) + "'s turn");
         }
+
     }
+
 
     public boolean checkWin(int i, int j, int color) {
 
@@ -183,7 +270,7 @@ public class board extends ActionBarActivity {
     }
 
     private String whichPlayer(int i) {
-        if (i % 2 == 0) {
+        if (i % 2 == 1) {
             return "Black";
         } else {
             return "White";

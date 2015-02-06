@@ -19,7 +19,7 @@ public class mainmenu extends Activity {
         button1.setOnClickListener(
                 new Button.OnClickListener() {
                     public void onClick(View v) {
-                        Intent mainIntent = new Intent(mainmenu.this, level.class);
+                        Intent mainIntent = new Intent(mainmenu.this, selection.class);
                         mainmenu.this.startActivity(mainIntent);
                     }
                 }
