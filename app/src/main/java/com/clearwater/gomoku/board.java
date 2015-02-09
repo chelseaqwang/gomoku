@@ -1,5 +1,6 @@
 package com.clearwater.gomoku;
 
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.graphics.Color;
 import android.widget.Button;
-import java.util.Random;
 
 
 public class board extends ActionBarActivity {
@@ -25,6 +25,9 @@ public class board extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
         size = intent.getIntExtra("SIZE", 10);
@@ -145,8 +148,6 @@ public class board extends ActionBarActivity {
         if(!checkIndex(i, j)) return;
         if (piece_array[i][j] != '\0') return;
 
-
-
         round++;
         piece_array[i][j] = 'b';
 
@@ -156,6 +157,7 @@ public class board extends ActionBarActivity {
         addContentView(playerPiece,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         display(i, j, Color.BLACK);
+        if(checkWin(i, j, Color.BLACK)) return;
 
         int[] ai = aiMove();
         if(!checkIndex(ai[0], ai[1])) return;
@@ -167,7 +169,7 @@ public class board extends ActionBarActivity {
                 new DrawPiece(context, ai[0]*grid+grid/2, ai[1]*grid+grid/2, radius, Color.WHITE);
         addContentView(aiPiece,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
-        display(i, j, Color.WHITE);
+        display(ai[0], ai[1], Color.WHITE);
 
     }
     private int getValue(int i,int j){
@@ -496,15 +498,12 @@ public class board extends ActionBarActivity {
 
 
     public int[] aiMove() {
-        int i, j,max;
-        max=0;i=0;j=0;
+        int max = 0;
         int maxi = -1, maxj = -1;
         int value;
-        for (i=0;i<size;i++) {
-            for (j = 0; j < size; j++) {
+        for (int i=0;i<size;i++) {
+            for (int j = 0; j < size; j++) {
                 value= getValue(i, j);
-                System.out.println(value);
-
                 if (value > max) {
                     max = value;
                     maxi = i;
@@ -572,17 +571,12 @@ public class board extends ActionBarActivity {
             if (!checkIndex(p, q)) continue;
             s.append(piece_array[p][q]);
         }
-        if (onlyFive(s.toString(), color)) return true;
+        return onlyFive(s.toString(), color);
 
-        return false;
     }
 
     private boolean checkIndex(int p, int q) {
-        if (p < 0 || p >= size || q < 0 || q >= size) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(p < 0 || p >= size || q < 0 || q >= size);
     }
 
     private boolean onlyFive(String s, int color) {
@@ -598,11 +592,7 @@ public class board extends ActionBarActivity {
             seven = "bwwwwwb";
         }
 
-        if (s.contains(five) && !s.contains(six) && !s.contains(seven)) {
-            return true;
-        } else {
-            return false;
-        }
+        return s.contains(five) && !s.contains(six) && !s.contains(seven);
     }
 
     private String whichPlayer(int i) {
