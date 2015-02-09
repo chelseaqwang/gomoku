@@ -190,7 +190,7 @@ public class board extends ActionBarActivity {
                 ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b')&&(temp[i-3][j+3]=='b')&&(temp[i-4][j+4]=='b')&&(temp[i-5][j+5]=='\0'))||
                 ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b')&&(temp[i+3][j-3]=='b')&&(temp[i+4][j-4]=='b')&&(temp[i+5][j-5]=='\0'))||
                 ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='b')&&(temp[i-2][j-2]=='b')&&(temp[i-3][j-3]=='b')&&(temp[i-4][j-4]=='b')&&(temp[i-5][j-5]=='\0'))){
-            value=8;
+            value=10;
             return value;
         }
         else if(((temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='w')&&(temp[i][j+4]=='w')&&(temp[i][j+5]=='\0'))||
@@ -201,7 +201,7 @@ public class board extends ActionBarActivity {
                 ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w')&&(temp[i-3][j+3]=='w')&&(temp[i-4][j+4]=='w')&&(temp[i-5][j+5]=='\0'))||
                 ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w')&&(temp[i+3][j-3]=='w')&&(temp[i+4][j-4]=='w')&&(temp[i+5][j-5]=='\0'))||
                 ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='w')&&(temp[i-2][j-2]=='w')&&(temp[i-3][j-3]=='w')&&(temp[i-4][j-4]=='w')&&(temp[i-5][j-5]=='\0'))){
-            value=7;
+            value=1000;
             return value;
         }
         else if(((temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='b')&&(temp[i][j+4]=='\0'))||
@@ -280,7 +280,7 @@ public class board extends ActionBarActivity {
                 ((temp[i+1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j]=='b')&&(temp[i-2][j]=='b')&&(temp[i-3][j]=='b')&&(temp[i-4][j]=='b'))||
                 ((temp[i-1][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b')&&(temp[i+3][j-3]=='b')&&(temp[i+4][j-4]=='b'))||
                 ((temp[i+1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b')&&(temp[i-3][j+3]=='b')&&(temp[i-4][j+4]=='b'))){
-            value=6;
+            value=200;
             return value;
         }
         else if(((temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='w')&&(temp[i][j+4]=='\0'))||
@@ -359,7 +359,7 @@ public class board extends ActionBarActivity {
                 ((temp[i+1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j]=='w')&&(temp[i-2][j]=='w')&&(temp[i-3][j]=='w')&&(temp[i-4][j]=='w'))||
                 ((temp[i-1][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w')&&(temp[i+3][j-3]=='w')&&(temp[i+4][j-4]=='w'))||
                 ((temp[i+1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w')&&(temp[i-3][j+3]=='w')&&(temp[i-4][j+4]=='w'))){
-            value=5;
+            value=500;
             return value;
         }
         else if(((temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='\0'))||
