@@ -145,6 +145,8 @@ public class board extends ActionBarActivity {
         if(!checkIndex(i, j)) return;
         if (piece_array[i][j] != '\0') return;
 
+
+
         round++;
         piece_array[i][j] = 'b';
 
@@ -155,7 +157,7 @@ public class board extends ActionBarActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT));
         display(i, j, Color.BLACK);
 
-        int[] ai = aiMove(piece_array, Color.WHITE);
+        int[] ai = aiMove();
         if(!checkIndex(ai[0], ai[1])) return;
         if (piece_array[ai[0]][ai[1]] != '\0') return;
         round++;
@@ -168,15 +170,349 @@ public class board extends ActionBarActivity {
         display(i, j, Color.WHITE);
 
     }
+    private int getValue(int i,int j){
+        char[][] temp = new char[size + 10][size + 10];
+        int value;
+        for (int x=0; x < size; x++) {
+            for (int y = 0; y < size; y++) {
+                temp[x + 5][y + 5] = piece_array[x][y];
+            }
+        }
+        i=i+5;
+        j=j+5;
+        if(((temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='b')&&(temp[i][j+4]=='b')&&(temp[i][j+5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='b')&&(temp[i][j-2]=='b')&&(temp[i][j-3]=='b')&&(temp[i][j-4]=='b')&&(temp[i][j-5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='b')&&(temp[i-2][j]=='b')&&(temp[i-3][j]=='b')&&(temp[i-4][j]=='b')&&(temp[i-5][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='b')&&(temp[i+3][j]=='b')&&(temp[i+4][j]=='b')&&(temp[i+5][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='b')&&(temp[i+3][j+3]=='b')&&(temp[i+4][j+4]=='b')&&(temp[i+5][j+5]=='\0'))||           //空红红红红空型
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b')&&(temp[i-3][j+3]=='b')&&(temp[i-4][j+4]=='b')&&(temp[i-5][j+5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b')&&(temp[i+3][j-3]=='b')&&(temp[i+4][j-4]=='b')&&(temp[i+5][j-5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='b')&&(temp[i-2][j-2]=='b')&&(temp[i-3][j-3]=='b')&&(temp[i-4][j-4]=='b')&&(temp[i-5][j-5]=='\0'))){
+            value=8;
+            return value;
+        }
+        else if(((temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='w')&&(temp[i][j+4]=='w')&&(temp[i][j+5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='w')&&(temp[i][j-2]=='w')&&(temp[i][j-3]=='w')&&(temp[i][j-4]=='w')&&(temp[i][j-5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='w')&&(temp[i-2][j]=='w')&&(temp[i-3][j]=='w')&&(temp[i-4][j]=='w')&&(temp[i-5][j]=='\0'))||                   //空红红红红空型
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='w')&&(temp[i+3][j]=='w')&&(temp[i+4][j]=='w')&&(temp[i+5][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='w')&&(temp[i+3][j+3]=='w')&&(temp[i+4][j+4]=='w')&&(temp[i+5][j+5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w')&&(temp[i-3][j+3]=='w')&&(temp[i-4][j+4]=='w')&&(temp[i-5][j+5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w')&&(temp[i+3][j-3]=='w')&&(temp[i+4][j-4]=='w')&&(temp[i+5][j-5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='w')&&(temp[i-2][j-2]=='w')&&(temp[i-3][j-3]=='w')&&(temp[i-4][j-4]=='w')&&(temp[i-5][j-5]=='\0'))){
+            value=7;
+            return value;
+        }
+        else if(((temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='b')&&(temp[i][j+4]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='b')&&(temp[i][j-2]=='b')&&(temp[i][j-3]=='b')&&(temp[i][j-4]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='b')&&(temp[i+3][j]=='b')&&(temp[i+4][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='b')&&(temp[i-2][j]=='b')&&(temp[i-3][j]=='b')&&(temp[i-4][j]=='\0'))||                            //空红红红空型
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='b')&&(temp[i+3][j+3]=='b')&&(temp[i+4][j+4]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b')&&(temp[i+3][j-3]=='b')&&(temp[i+4][j-4]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b')&&(temp[i-3][j+3]=='b')&&(temp[i-4][j+4]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='b')&&(temp[i-2][j-2]=='b')&&(temp[i-3][j-3]=='b')&&(temp[i-4][j-4]=='\0'))||
 
-    public int[] aiMove(char[][] pArray, int color) {
-        int i, j;
-        do {
-            Random random = new Random();
-            i = random.nextInt(size);
-            j = random.nextInt(size);
-        } while(pArray[i][j] != '\0');
-        return new int[] {i, j};
+                ((temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='\0')&&(temp[i][j+3]=='b')&&(temp[i][j+4]=='b')&&(temp[i][j+5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='b')&&(temp[i][j-2]=='\0')&&(temp[i][j-3]=='b')&&(temp[i][j-4]=='b')&&(temp[i][j-5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='\0')&&(temp[i+3][j]=='b')&&(temp[i+4][j]=='b')&&(temp[i+5][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='b')&&(temp[i-2][j]=='\0')&&(temp[i-3][j]=='b')&&(temp[i-4][j]=='b')&&(temp[i-5][j]=='\0'))||                               //空红空红红空
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='\0')&&(temp[i+3][j+3]=='b')&&(temp[i+4][j+4]=='b')&&(temp[i+5][j+5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='\0')&&(temp[i+3][j-3]=='b')&&(temp[i+4][j-4]=='b')&&(temp[i+5][j-5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='\0')&&(temp[i-3][j+3]=='b')&&(temp[i-4][j+4]=='b')&&(temp[i-5][j+5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='b')&&(temp[i-2][j-2]=='\0')&&(temp[i-3][j-3]=='b')&&(temp[i-4][j-4]=='b')&&(temp[i-5][j-5]=='\0'))||
+
+                ((temp[i][j-2]=='b')&&(temp[i][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b'))||
+                ((temp[i-2][j]=='b')&&(temp[i-1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='b'))||
+                ((temp[i+2][j-2]=='b')&&(temp[i+1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b'))||
+                ((temp[i-2][j+2]=='b')&&(temp[i-1][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b'))||                            //红红空红红型
+
+                ((temp[i][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='b'))||
+                ((temp[i-1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='b')&&(temp[i+3][j]=='b'))||
+                ((temp[i][j-3]=='b')&&(temp[i][j-2]=='b')&&(temp[i][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b'))||
+                ((temp[i-3][j]=='b')&&(temp[i-2][j]=='b')&&(temp[i-1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='b'))||                            //红空红红红型
+                ((temp[i-1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='b')&&(temp[i+3][j+3]=='b'))||
+                ((temp[i-3][j-3]=='b')&&(temp[i-2][j-2]=='b')&&(temp[i-1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='b'))||
+                ((temp[i-1][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b')&&(temp[i+3][j-3]=='b'))||
+                ((temp[i+1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b')&&(temp[i-3][j+3]=='b'))||
+
+                ((temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='b')&&(temp[i][j+4]=='b')&&(temp[i][j+5]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='b')&&(temp[i][j-2]=='b')&&(temp[i][j-3]=='b')&&(temp[i][j-4]=='b')&&(temp[i][j-5]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='b')&&(temp[i-2][j]=='b')&&(temp[i-3][j]=='b')&&(temp[i-4][j]=='b')&&(temp[i-5][j]=='w'))||                   //空红红红红蓝型
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='b')&&(temp[i+3][j]=='b')&&(temp[i+4][j]=='b')&&(temp[i+5][j]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='b')&&(temp[i+3][j+3]=='b')&&(temp[i+4][j+4]=='b')&&(temp[i+5][j+5]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b')&&(temp[i-3][j+3]=='b')&&(temp[i-4][j+4]=='b')&&(temp[i-5][j+5]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b')&&(temp[i+3][j-3]=='b')&&(temp[i+4][j-4]=='b')&&(temp[i+5][j-5]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='b')&&(temp[i-2][j-2]=='b')&&(temp[i-3][j-3]=='b')&&(temp[i-4][j-4]=='b')&&(temp[i-5][j-5]=='w'))||
+
+                ((temp[i][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='b')&&(temp[i][j+4]=='w'))||
+                ((temp[i-1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='b')&&(temp[i+3][j]=='b')&&(temp[i+4][j]=='w'))||
+                ((temp[i][j-4]=='w')&&(temp[i][j-3]=='b')&&(temp[i][j-2]=='b')&&(temp[i][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b'))||
+                ((temp[i][j-4]=='w')&&(temp[i-3][j]=='b')&&(temp[i-2][j]=='b')&&(temp[i-1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='b'))||                            //红空红红红蓝
+                ((temp[i-1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='b')&&(temp[i+3][j+3]=='b')&&(temp[i+4][j+4]=='w'))||
+                ((temp[i-4][j-4]=='w')&&(temp[i-3][j-3]=='b')&&(temp[i-2][j-2]=='b')&&(temp[i-1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='b'))||
+                ((temp[i-1][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b')&&(temp[i+3][j-3]=='b')&&(temp[i+4][j-4]=='w'))||
+                ((temp[i+1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b')&&(temp[i-3][j+3]=='b')&&(temp[i-4][j+4]=='w'))||
+
+                ((temp[i][j-2]=='w')&&(temp[i][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='b'))||
+                ((temp[i-2][j]=='w')&&(temp[i-1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='b')&&(temp[i+3][j]=='b'))||
+                ((temp[i][j-3]=='b')&&(temp[i][j-2]=='b')&&(temp[i][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='w'))||
+                ((temp[i-3][j]=='b')&&(temp[i-2][j]=='b')&&(temp[i-1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='w'))||                            //红红红空红蓝型
+                ((temp[i-2][j-2]=='w')&&(temp[i-1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='b')&&(temp[i+3][j+3]=='b'))||
+                ((temp[i-3][j-3]=='b')&&(temp[i-2][j-2]=='b')&&(temp[i-1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='w'))||
+                ((temp[i-2][j+2]=='w')&&(temp[i-1][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b')&&(temp[i+3][j-3]=='b'))||
+                ((temp[i+2][j-2]=='w')&&(temp[i+1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b')&&(temp[i-3][j+3]=='b'))||
+
+                ((temp[i][j-3]=='w')&&(temp[i][j-2]=='b')&&(temp[i][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b'))||
+                ((temp[i-3][j]=='w')&&(temp[i-2][j]=='b')&&(temp[i-1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='b'))||
+                ((temp[i+3][j-3]=='w')&&(temp[i+2][j-2]=='b')&&(temp[i+1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b'))||
+                ((temp[i-3][j+3]=='w')&&(temp[i-2][j+2]=='b')&&(temp[i-1][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b'))||
+                ((temp[i][j-2]=='b')&&(temp[i][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='w'))||                            //红红空红红蓝型
+                ((temp[i-2][j]=='b')&&(temp[i-1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='b')&&(temp[i+3][j]=='w'))||
+                ((temp[i-3][j-3]=='w')&&(temp[i-2][j-2]=='b')&&(temp[i-1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='b'))||
+                ((temp[i+3][j+3]=='w')&&(temp[i+2][j+2]=='b')&&(temp[i+1][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j-1]=='b')&&(temp[i-2][j-2]=='b'))||
+
+                ((temp[i][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='b')&&(temp[i][j+4]=='b'))||
+                ((temp[i-1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='b')&&(temp[i+3][j]=='b')&&(temp[i+4][j]=='b'))||
+                ((temp[i-1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='b')&&(temp[i+3][j+3]=='b')&&(temp[i+4][j+4]=='b'))||
+                ((temp[i+1][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j-1]=='b')&&(temp[i-2][j-2]=='b')&&(temp[i-3][j-3]=='b')&&(temp[i-4][j-4]=='b'))||
+                ((temp[i][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='b')&&(temp[i][j+4]=='b'))||           //红红红红空蓝型
+                ((temp[i+1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j]=='b')&&(temp[i-2][j]=='b')&&(temp[i-3][j]=='b')&&(temp[i-4][j]=='b'))||
+                ((temp[i-1][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b')&&(temp[i+3][j-3]=='b')&&(temp[i+4][j-4]=='b'))||
+                ((temp[i+1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b')&&(temp[i-3][j+3]=='b')&&(temp[i-4][j+4]=='b'))){
+            value=6;
+            return value;
+        }
+        else if(((temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='w')&&(temp[i][j+4]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='w')&&(temp[i][j-2]=='w')&&(temp[i][j-3]=='w')&&(temp[i][j-4]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='w')&&(temp[i+3][j]=='w')&&(temp[i+4][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='w')&&(temp[i-2][j]=='w')&&(temp[i-3][j]=='w')&&(temp[i-4][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='w')&&(temp[i+3][j+3]=='w')&&(temp[i+4][j+4]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w')&&(temp[i+3][j-3]=='w')&&(temp[i+4][j-4]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w')&&(temp[i-3][j+3]=='w')&&(temp[i-4][j+4]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='w')&&(temp[i-2][j-2]=='w')&&(temp[i-3][j-3]=='w')&&(temp[i-4][j-4]=='\0'))||
+
+                ((temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='\0')&&(temp[i][j+3]=='w')&&(temp[i][j+4]=='w')&&(temp[i][j+5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='w')&&(temp[i][j-2]=='\0')&&(temp[i][j-3]=='w')&&(temp[i][j-4]=='w')&&(temp[i][j-5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='\0')&&(temp[i+3][j]=='w')&&(temp[i+4][j]=='w')&&(temp[i+5][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='w')&&(temp[i-2][j]=='\0')&&(temp[i-3][j]=='w')&&(temp[i-4][j]=='w')&&(temp[i-5][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='\0')&&(temp[i+3][j+3]=='w')&&(temp[i+4][j+4]=='w')&&(temp[i+5][j+5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='\0')&&(temp[i+3][j-3]=='w')&&(temp[i+4][j-4]=='w')&&(temp[i+5][j-5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='\0')&&(temp[i-3][j+3]=='w')&&(temp[i-4][j+4]=='w')&&(temp[i-5][j+5]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='w')&&(temp[i-2][j-2]=='\0')&&(temp[i-3][j-3]=='w')&&(temp[i-4][j-4]=='w')&&(temp[i-5][j-5]=='\0'))||
+
+                ((temp[i][j-2]=='w')&&(temp[i][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w'))||
+                ((temp[i-2][j]=='w')&&(temp[i-1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='w'))||
+                ((temp[i+2][j-2]=='w')&&(temp[i+1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w'))||
+                ((temp[i-2][j+2]=='w')&&(temp[i-1][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w'))||
+
+                ((temp[i][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='w'))||
+                ((temp[i-1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='w')&&(temp[i+3][j]=='w'))||
+                ((temp[i][j-3]=='w')&&(temp[i][j-2]=='w')&&(temp[i][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w'))||
+                ((temp[i-3][j]=='w')&&(temp[i-2][j]=='w')&&(temp[i-1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='w'))||
+                ((temp[i-1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='w')&&(temp[i+3][j+3]=='w'))||
+                ((temp[i-3][j-3]=='w')&&(temp[i-2][j-2]=='w')&&(temp[i-1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='w'))||
+                ((temp[i-1][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w')&&(temp[i+3][j-3]=='w'))||
+                ((temp[i+1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w')&&(temp[i-3][j+3]=='w'))||
+
+                ((temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='w')&&(temp[i][j+4]=='w')&&(temp[i][j+5]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='w')&&(temp[i][j-2]=='w')&&(temp[i][j-3]=='w')&&(temp[i][j-4]=='w')&&(temp[i][j-5]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='w')&&(temp[i-2][j]=='w')&&(temp[i-3][j]=='w')&&(temp[i-4][j]=='w')&&(temp[i-5][j]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='w')&&(temp[i+3][j]=='w')&&(temp[i+4][j]=='w')&&(temp[i+5][j]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='w')&&(temp[i+3][j+3]=='w')&&(temp[i+4][j+4]=='w')&&(temp[i+5][j+5]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w')&&(temp[i-3][j+3]=='w')&&(temp[i-4][j+4]=='w')&&(temp[i-5][j+5]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w')&&(temp[i+3][j-3]=='w')&&(temp[i+4][j-4]=='w')&&(temp[i+5][j-5]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='w')&&(temp[i-2][j-2]=='w')&&(temp[i-3][j-3]=='w')&&(temp[i-4][j-4]=='w')&&(temp[i-5][j-5]=='b'))||
+
+                ((temp[i][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='w')&&(temp[i][j+4]=='b'))||
+                ((temp[i-1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='w')&&(temp[i+3][j]=='w')&&(temp[i+4][j]=='b'))||
+                ((temp[i][j-4]=='b')&&(temp[i][j-3]=='w')&&(temp[i][j-2]=='w')&&(temp[i][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w'))||
+                ((temp[i][j-4]=='b')&&(temp[i-3][j]=='w')&&(temp[i-2][j]=='w')&&(temp[i-1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='w'))||
+                ((temp[i-1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='w')&&(temp[i+3][j+3]=='w')&&(temp[i+4][j+4]=='b'))||
+                ((temp[i-4][j-4]=='b')&&(temp[i-3][j-3]=='w')&&(temp[i-2][j-2]=='w')&&(temp[i-1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='w'))||
+                ((temp[i-1][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w')&&(temp[i+3][j-3]=='w')&&(temp[i+4][j-4]=='b'))||
+                ((temp[i+1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w')&&(temp[i-3][j+3]=='w')&&(temp[i-4][j+4]=='b'))||
+
+                ((temp[i][j-2]=='b')&&(temp[i][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='w'))||
+                ((temp[i-2][j]=='b')&&(temp[i-1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='w')&&(temp[i+3][j]=='w'))||
+                ((temp[i][j-3]=='w')&&(temp[i][j-2]=='w')&&(temp[i][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='b'))||
+                ((temp[i-3][j]=='w')&&(temp[i-2][j]=='w')&&(temp[i-1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='b'))||
+                ((temp[i-2][j-2]=='b')&&(temp[i-1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='w')&&(temp[i+3][j+3]=='w'))||
+                ((temp[i-3][j-3]=='w')&&(temp[i-2][j-2]=='w')&&(temp[i-1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='b'))||
+                ((temp[i-2][j+2]=='b')&&(temp[i-1][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w')&&(temp[i+3][j-3]=='w'))||
+                ((temp[i+2][j-2]=='b')&&(temp[i+1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w')&&(temp[i-3][j+3]=='w'))||
+
+                ((temp[i][j-3]=='b')&&(temp[i][j-2]=='w')&&(temp[i][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w'))||
+                ((temp[i-3][j]=='b')&&(temp[i-2][j]=='w')&&(temp[i-1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='w'))||
+                ((temp[i+3][j-3]=='b')&&(temp[i+2][j-2]=='w')&&(temp[i+1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w'))||
+                ((temp[i-3][j+3]=='b')&&(temp[i-2][j+2]=='w')&&(temp[i-1][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w'))||
+                ((temp[i][j-2]=='w')&&(temp[i][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='b'))||
+                ((temp[i-2][j]=='w')&&(temp[i-1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='w')&&(temp[i+3][j]=='b'))||
+                ((temp[i-3][j-3]=='b')&&(temp[i-2][j-2]=='w')&&(temp[i-1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='w'))||
+                ((temp[i+3][j+3]=='b')&&(temp[i+2][j+2]=='w')&&(temp[i+1][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j-1]=='w')&&(temp[i-2][j-2]=='w'))||
+
+                ((temp[i][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='w')&&(temp[i][j+4]=='w'))||
+                ((temp[i-1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='w')&&(temp[i+3][j]=='w')&&(temp[i+4][j]=='w'))||
+                ((temp[i-1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='w')&&(temp[i+3][j+3]=='w')&&(temp[i+4][j+4]=='w'))||
+                ((temp[i+1][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j-1]=='w')&&(temp[i-2][j-2]=='w')&&(temp[i-3][j-3]=='w')&&(temp[i-4][j-4]=='w'))||
+                ((temp[i][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='w')&&(temp[i][j+4]=='w'))||
+                ((temp[i+1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j]=='w')&&(temp[i-2][j]=='w')&&(temp[i-3][j]=='w')&&(temp[i-4][j]=='w'))||
+                ((temp[i-1][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w')&&(temp[i+3][j-3]=='w')&&(temp[i+4][j-4]=='w'))||
+                ((temp[i+1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w')&&(temp[i-3][j+3]=='w')&&(temp[i-4][j+4]=='w'))){
+            value=5;
+            return value;
+        }
+        else if(((temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='b')&&(temp[i][j-2]=='b')&&(temp[i][j-3]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='b')&&(temp[i+3][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='b')&&(temp[i-2][j]=='b')&&(temp[i-3][j]=='\0'))||                            //空红红空型
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='b')&&(temp[i+3][j+3]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b')&&(temp[i+3][j-3]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b')&&(temp[i-3][j+3]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='b')&&(temp[i-2][j-2]=='b')&&(temp[i-3][j-3]=='\0'))||
+
+                ((temp[i-2][j]=='\0')&&(temp[i-1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='\0'))||
+                ((temp[i][j-2]=='\0')&&(temp[i][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='\0'))||                          //空红空红空型
+                ((temp[i-2][j+2]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='\0'))||
+                ((temp[i-2][j-2]=='\0')&&(temp[i-1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='\0'))||
+
+                ((temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='b')&&(temp[i][j+4]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='b')&&(temp[i][j-2]=='b')&&(temp[i][j-3]=='b')&&(temp[i][j-4]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='b')&&(temp[i+3][j]=='b')&&(temp[i+4][j]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='b')&&(temp[i-2][j]=='b')&&(temp[i-3][j]=='b')&&(temp[i-4][j]=='w'))||                            //空红红红蓝型
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='b')&&(temp[i+3][j+3]=='b')&&(temp[i+4][j+4]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b')&&(temp[i+3][j-3]=='b')&&(temp[i+4][j-4]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b')&&(temp[i-3][j+3]=='b')&&(temp[i-4][j+4]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='b')&&(temp[i-2][j-2]=='b')&&(temp[i-3][j-3]=='b')&&(temp[i-4][j-4]=='w'))||
+
+                ((temp[i][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='w'))||
+                ((temp[i-1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='b')&&(temp[i+3][j]=='w'))||
+                ((temp[i][j-3]=='w')&&(temp[i][j-2]=='b')&&(temp[i][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b'))||
+                ((temp[i-3][j]=='w')&&(temp[i-2][j]=='b')&&(temp[i-1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='b'))||                            //红空红红蓝型
+                ((temp[i-1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='b')&&(temp[i+3][j+3]=='w'))||
+                ((temp[i-3][j-3]=='w')&&(temp[i-2][j-2]=='b')&&(temp[i-1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='b'))||
+                ((temp[i-1][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b')&&(temp[i+3][j-3]=='w'))||
+                ((temp[i+1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b')&&(temp[i-3][j+3]=='w'))||
+
+                ((temp[i][j-2]=='b')&&(temp[i][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='w'))||
+                ((temp[i-2][j]=='b')&&(temp[i-1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='w'))||
+                ((temp[i+2][j-2]=='b')&&(temp[i+1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='w'))||
+                ((temp[i-2][j+2]=='b')&&(temp[i-1][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='w'))||                            //红红空红蓝型
+                ((temp[i][j+2]=='b')&&(temp[i][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i][j-1]=='b')&&(temp[i][j-2]=='w'))||
+                ((temp[i+2][j]=='b')&&(temp[i+1][j]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j]=='b')&&(temp[i-2][j]=='w'))||
+                ((temp[i-2][j+2]=='b')&&(temp[i-1][j+1]=='b')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='w'))||
+                ((temp[i+2][j-2]=='b')&&(temp[i+1][j-1]=='b')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='w'))){
+            value=4;
+            return value;
+        }
+        else if(((temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='w')&&(temp[i][j-2]=='w')&&(temp[i][j-3]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='w')&&(temp[i+3][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='w')&&(temp[i-2][j]=='w')&&(temp[i-3][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='w')&&(temp[i+3][j+3]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w')&&(temp[i+3][j-3]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w')&&(temp[i-3][j+3]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='w')&&(temp[i-2][j-2]=='w')&&(temp[i-3][j-3]=='\0'))||
+
+                ((temp[i-2][j]=='\0')&&(temp[i-1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='\0'))||
+                ((temp[i][j-2]=='\0')&&(temp[i][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='\0'))||
+                ((temp[i-2][j+2]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='\0'))||
+                ((temp[i-2][j-2]=='\0')&&(temp[i-1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='\0'))||
+
+                ((temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='w')&&(temp[i][j+4]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='w')&&(temp[i][j-2]=='w')&&(temp[i][j-3]=='w')&&(temp[i][j-4]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='w')&&(temp[i+3][j]=='w')&&(temp[i+4][j]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='w')&&(temp[i-2][j]=='w')&&(temp[i-3][j]=='w')&&(temp[i-4][j]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='w')&&(temp[i+3][j+3]=='w')&&(temp[i+4][j+4]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w')&&(temp[i+3][j-3]=='w')&&(temp[i+4][j-4]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w')&&(temp[i-3][j+3]=='w')&&(temp[i-4][j+4]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='w')&&(temp[i-2][j-2]=='w')&&(temp[i-3][j-3]=='w')&&(temp[i-4][j-4]=='b'))||
+
+                ((temp[i][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='b'))||
+                ((temp[i-1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='w')&&(temp[i+3][j]=='b'))||
+                ((temp[i][j-3]=='b')&&(temp[i][j-2]=='w')&&(temp[i][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w'))||
+                ((temp[i-3][j]=='b')&&(temp[i-2][j]=='w')&&(temp[i-1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='w'))||
+                ((temp[i-1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='w')&&(temp[i+3][j+3]=='b'))||
+                ((temp[i-3][j-3]=='b')&&(temp[i-2][j-2]=='w')&&(temp[i-1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j+1]=='w'))||
+                ((temp[i-1][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w')&&(temp[i+3][j-3]=='b'))||
+                ((temp[i+1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w')&&(temp[i-3][j+3]=='b'))||
+
+                ((temp[i][j-2]=='w')&&(temp[i][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='b'))||
+                ((temp[i-2][j]=='w')&&(temp[i-1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='b'))||
+                ((temp[i+2][j-2]=='w')&&(temp[i+1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='b'))||
+                ((temp[i-2][j+2]=='w')&&(temp[i-1][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='b'))||
+                ((temp[i][j+2]=='w')&&(temp[i][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i][j-1]=='w')&&(temp[i][j-2]=='b'))||
+                ((temp[i+2][j]=='w')&&(temp[i+1][j]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j]=='w')&&(temp[i-2][j]=='b'))||
+                ((temp[i-2][j+2]=='w')&&(temp[i-1][j+1]=='w')&&(temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='b'))||
+                ((temp[i+2][j-2]=='w')&&(temp[i+1][j-1]=='w')&&(temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='b'))){
+            value=3;
+            return value;
+        }
+        else if(((temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='b')&&(temp[i][j-2]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='b')&&(temp[i-2][j]=='\0'))||                               //空红空
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='b')&&(temp[i-2][j-2]=='\0'))||
+
+                ((temp[i][j]=='\0')&&(temp[i][j+1]=='b')&&(temp[i][j+2]=='b')&&(temp[i][j+3]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='b')&&(temp[i][j-2]=='b')&&(temp[i][j-3]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='b')&&(temp[i+2][j]=='b')&&(temp[i+3][j]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='b')&&(temp[i-2][j]=='b')&&(temp[i-3][j]=='w'))||                            //空红红蓝型
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='b')&&(temp[i+2][j+2]=='b')&&(temp[i+3][j+3]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='b')&&(temp[i+2][j-2]=='b')&&(temp[i+3][j-3]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='b')&&(temp[i-2][j+2]=='b')&&(temp[i-3][j+3]=='w'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='b')&&(temp[i-2][j-2]=='b')&&(temp[i-3][j-3]=='w'))){
+            value=2;
+            return value;
+        }
+        else if(((temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='w')&&(temp[i][j-2]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='w')&&(temp[i-2][j]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='\0'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='w')&&(temp[i-2][j-2]=='\0'))||
+
+                ((temp[i][j]=='\0')&&(temp[i][j+1]=='w')&&(temp[i][j+2]=='w')&&(temp[i][j+3]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i][j-1]=='w')&&(temp[i][j-2]=='w')&&(temp[i][j-3]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j]=='w')&&(temp[i+2][j]=='w')&&(temp[i+3][j]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j]=='w')&&(temp[i-2][j]=='w')&&(temp[i-3][j]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j+1]=='w')&&(temp[i+2][j+2]=='w')&&(temp[i+3][j+3]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i+1][j-1]=='w')&&(temp[i+2][j-2]=='w')&&(temp[i+3][j-3]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j+1]=='w')&&(temp[i-2][j+2]=='w')&&(temp[i-3][j+3]=='b'))||
+                ((temp[i][j]=='\0')&&(temp[i-1][j-1]=='w')&&(temp[i-2][j-2]=='w')&&(temp[i-3][j-3]=='b'))){
+            value=1;
+            return value;
+        }
+        else{
+            value=0;
+            return value;
+        }
+
+
+    }
+
+
+    public int[] aiMove() {
+        int i, j,max;
+        max=0;i=0;j=0;
+        int maxi = -1, maxj = -1;
+        int value;
+        for (i=0;i<size;i++) {
+            for (j = 0; j < size; j++) {
+                value= getValue(i, j);
+                System.out.println(value);
+
+                if (value > max) {
+                    max = value;
+                    maxi = i;
+                    maxj = j;
+                }
+            }
+        }
+        return new int[]{maxi, maxj};
     }
 
     public void display(int i, int j, int color) {
