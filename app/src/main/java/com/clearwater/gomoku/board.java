@@ -1,5 +1,6 @@
 package com.clearwater.gomoku;
 
+import android.os.SystemClock;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.MotionEvent;
 import android.content.Intent;
 import android.content.Context;
 import android.view.ViewGroup;
+import android.widget.Chronometer;
 import android.widget.TextView;
 import android.graphics.Color;
 import android.widget.Button;
@@ -172,6 +174,7 @@ public class board extends ActionBarActivity {
         display(ai[0], ai[1], Color.WHITE);
 
     }
+
     private int getValue(int i,int j){
         char[][] temp = new char[size + 10][size + 10];
         int value;
@@ -496,8 +499,7 @@ public class board extends ActionBarActivity {
 
     }
 
-
-    public int[] aiMove() {
+    private int[] aiMove() {
         int max = 0;
         int maxi = -1, maxj = -1;
         int value;
@@ -514,16 +516,22 @@ public class board extends ActionBarActivity {
         return new int[]{maxi, maxj};
     }
 
-    public void display(int i, int j, int color) {
+    private void display(int i, int j, int color) {
         TextView textView = (TextView)findViewById(R.id.winText);
+        Chronometer chronometer = (Chronometer) findViewById(R.id.chronometer);
         String player;
         if (color == Color.BLACK) {
             player = "Black";
         } else {
             player = "White";
         }
-        if(round > 8 && checkWin(i, j, color)) {
-            textView.setText(player + " wins!");
+        if(round > 8 && (checkWin(i, j, color) || checkTie())) {
+            if (checkWin(i, j, color)) {
+                textView.setText(player + " wins!");
+            } else if (checkTie()) {
+                textView.setText("It's a tie!");
+            }
+            chronometer.stop();
             drawBoard.setOnTouchListener(null);
 
             Button button_play_again = (Button)findViewById(R.id.button_play_again);
@@ -540,12 +548,13 @@ public class board extends ActionBarActivity {
             );
         } else {
             textView.setText(whichPlayer(round + 1) + "'s turn");
+            chronometer.setBase(SystemClock.elapsedRealtime());
+            chronometer.start();
         }
 
     }
 
-
-    public boolean checkWin(int i, int j, int color) {
+    private boolean checkWin(int i, int j, int color) {
 
         StringBuffer s = new StringBuffer();
         for (int p = Math.max(i-5, 0); p < Math.min(i+6, size); p++) {
@@ -575,13 +584,60 @@ public class board extends ActionBarActivity {
 
     }
 
+    private boolean checkTie() {
+        if (round < size * size * 0.7) return false;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (piece_array[i][j] != '\0') continue;
+                String sblack, swhite;
+                StringBuffer s = new StringBuffer();
+                for (int p = Math.max(i-5, 0); p < Math.min(i+6, size); p++) {
+                    s.append(piece_array[p][j]);
+                }
+                sblack = s.toString().replace('\0', 'b');
+                if (sblack.contains("bbbbb")) return false;
+                swhite = s.toString().replace('\0', 'w');
+                if (swhite.contains("wwwww")) return false;
+
+                s = new StringBuffer();
+                for (int q = Math.max(j-5, 0); q < Math.min(j+6, size); q++) {
+                    s.append(piece_array[i][q]);
+                }
+                sblack = s.toString().replace('\0', 'b');
+                if (sblack.contains("bbbbb")) return false;
+                swhite = s.toString().replace('\0', 'w');
+                if (swhite.contains("wwwww")) return false;
+
+                s = new StringBuffer();
+                for (int p = i-5, q = j-5; p < i+6; p++, q++) {
+                    if (!checkIndex(p, q)) continue;
+                    s.append(piece_array[p][q]);
+                }
+                sblack = s.toString().replace('\0', 'b');
+                if (sblack.contains("bbbbb")) return false;
+                swhite = s.toString().replace('\0', 'w');
+                if (swhite.contains("wwwww")) return false;
+
+                s = new StringBuffer();
+                for (int p = i-5, q = j+5; p < i+6; p++, q--) {
+                    if (!checkIndex(p, q)) continue;
+                    s.append(piece_array[p][q]);
+                }
+                sblack = s.toString().replace('\0', 'b');
+                if (sblack.contains("bbbbb")) return false;
+                swhite = s.toString().replace('\0', 'w');
+                if (swhite.contains("wwwww")) return false;
+            }
+        }
+    return true;
+    }
+
     private boolean checkIndex(int p, int q) {
         return !(p < 0 || p >= size || q < 0 || q >= size);
     }
 
     private boolean onlyFive(String s, int color) {
         String five, six, seven;
-
         if(color == Color.BLACK) {
             five = "bbbbb";
             six = "bbbbbb";
