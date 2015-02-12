@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.clearwater.gomoku" >
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".load"
+            android:name=".Load"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,7 +16,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".mainmenu"
+            android:name=".Mainmenu"
             android:label="@string/title_activity_mainmenu" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,7 +25,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".selection"
+            android:name=".Select"
             android:label="selection" >
         </activity>
         <activity
@@ -34,21 +33,35 @@
             android:label="@string/title_activity_settings" >
         </activity>
         <activity
-            android:name=".profile"
+            android:name=".Profile"
             android:label="@string/title_activity_profile" >
         </activity>
         <activity
-            android:name=".statistics"
+            android:name=".Statistics"
             android:label="@string/title_activity_statistics" >
         </activity>
         <activity
-            android:name=".board"
+            android:name=".PlayIF"
             android:label="@string/back"
-            android:parentActivityName=".mainmenu" >
+            android:parentActivityName=".Mainmenu" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".mainmenu" />
+                android:value=".Mainmenu" />
+        </activity>
+        <activity
+            android:name=".Offline"
+            android:parentActivityName=".Mainmenu"
+            android:label="Offline" >
+        </activity>
+        <activity
+            android:name=".AI"
+            android:label="AI"
+            android:parentActivityName=".Mainmenu" >
+        </activity>
+        <activity
+            android:name=".Online"
+            android:label="Online"
+            android:parentActivityName=".Mainmenu" >
         </activity>
     </application>
-
 </manifest>

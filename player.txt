@@ -1,0 +1,2 @@
+Peter	10
+Jean	5

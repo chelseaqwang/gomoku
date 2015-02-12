@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.Button;
 
 
-public class mainmenu extends Activity {
+public class Mainmenu extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,8 +19,8 @@ public class mainmenu extends Activity {
         button1.setOnClickListener(
                 new Button.OnClickListener() {
                     public void onClick(View v) {
-                        Intent mainIntent = new Intent(mainmenu.this, selection.class);
-                        mainmenu.this.startActivity(mainIntent);
+                        Intent mainIntent = new Intent(Mainmenu.this, Select.class);
+                        Mainmenu.this.startActivity(mainIntent);
                     }
                 }
         );
@@ -29,8 +29,8 @@ public class mainmenu extends Activity {
         button2.setOnClickListener(
                 new Button.OnClickListener() {
                     public void onClick(View v) {
-                        Intent mainIntent = new Intent(mainmenu.this, profile.class);
-                        mainmenu.this.startActivity(mainIntent);
+                        Intent mainIntent = new Intent(Mainmenu.this, Profile.class);
+                        Mainmenu.this.startActivity(mainIntent);
                     }
                 }
         );
@@ -39,8 +39,8 @@ public class mainmenu extends Activity {
         button3.setOnClickListener(
                 new Button.OnClickListener() {
                     public void onClick(View v) {
-                        Intent mainIntent = new Intent(mainmenu.this, statistics.class);
-                        mainmenu.this.startActivity(mainIntent);
+                        Intent mainIntent = new Intent(Mainmenu.this, Statistics.class);
+                        Mainmenu.this.startActivity(mainIntent);
                     }
                 }
         );
@@ -49,8 +49,8 @@ public class mainmenu extends Activity {
         button4.setOnClickListener(
                 new Button.OnClickListener() {
                     public void onClick(View v) {
-                        Intent mainIntent = new Intent(mainmenu.this, SettingsActivity.class);
-                        mainmenu.this.startActivity(mainIntent);
+                        Intent mainIntent = new Intent(Mainmenu.this, SettingsActivity.class);
+                        Mainmenu.this.startActivity(mainIntent);
                     }
                 }
         );
@@ -59,7 +59,7 @@ public class mainmenu extends Activity {
         button5.setOnClickListener(
                 new Button.OnClickListener() {
                     public void onClick(View v) {
-                        mainmenu.this.finish();
+                        Mainmenu.this.finish();
                     }
                 }
         );

@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
-public class load extends Activity {
+public class Load extends Activity {
 
     private final int LOAD_DISPLAY_LENGHT = 2000;
 
@@ -16,9 +16,9 @@ public class load extends Activity {
 
         new Handler().postDelayed(new Runnable() {
             public void run() {
-                Intent mainIntent = new Intent(load.this, mainmenu.class);
-                load.this.startActivity(mainIntent);
-                load.this.finish();
+                Intent mainIntent = new Intent(Load.this, Mainmenu.class);
+                Load.this.startActivity(mainIntent);
+                Load.this.finish();
             }
         }, LOAD_DISPLAY_LENGHT);
 

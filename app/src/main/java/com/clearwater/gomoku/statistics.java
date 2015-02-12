@@ -6,7 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class statistics extends ActionBarActivity {
+public class Statistics extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
