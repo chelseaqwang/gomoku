@@ -63,6 +63,16 @@ public class Mainmenu extends Activity {
                     }
                 }
         );
+
+        Button button = (Button)findViewById(R.id.button);
+        button.setOnClickListener(
+                new Button.OnClickListener() {
+                    public void onClick(View v) {
+                        Intent mainIntent = new Intent(Mainmenu.this, BluetoothPair.class);
+                        Mainmenu.this.startActivity(mainIntent);
+                    }
+                }
+        );
     }
 
 }

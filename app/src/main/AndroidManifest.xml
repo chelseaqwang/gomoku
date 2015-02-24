@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.clearwater.gomoku" >
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -50,8 +51,8 @@
         </activity>
         <activity
             android:name=".Offline"
-            android:parentActivityName=".Mainmenu"
-            android:label="Offline" >
+            android:label="Offline"
+            android:parentActivityName=".Mainmenu" >
         </activity>
         <activity
             android:name=".AI"
@@ -63,5 +64,10 @@
             android:label="Online"
             android:parentActivityName=".Mainmenu" >
         </activity>
+        <activity
+            android:name=".BluetoothPair"
+            android:label="@string/title_activity_bluetooth_pair" >
+        </activity>
     </application>
+
 </manifest>

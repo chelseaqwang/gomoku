@@ -18,7 +18,7 @@ public class AI extends PlayIF {
     public void play(MotionEvent m) {
         float x = m.getX();
         float y = m.getY();
-        float grid = 800/size;
+        float grid = 1200/size;
         float radius;
         int i, j;
 
@@ -393,6 +393,7 @@ public class AI extends PlayIF {
         button_play_again.setOnClickListener (
                 new Button.OnClickListener() {
                     public void onClick(View v) {
+                        AI.this.finish();
                         Intent intent = new Intent(AI.this, AI.class);
                         intent.putExtra("SIZE", size);
                         startActivity(intent);

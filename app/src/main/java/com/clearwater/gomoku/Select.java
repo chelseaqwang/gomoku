@@ -34,14 +34,11 @@ public class Select extends Activity {
                         RadioButton modeRB = (RadioButton)findViewById(modeSelected);
                         Intent intent = null;
                         switch(modeRB.getText().toString()) {
-                            case "Offline":
+                            case "Player vs. Player":
                                 intent = new Intent(Select.this, Offline.class);
                                 break;
-                            case "Computer":
+                            case "Player vs. AI":
                                 intent = new Intent(Select.this, AI.class);
-                                break;
-                            case "Online":
-                                intent = new Intent(Select.this, Online.class);
                                 break;
                         }
                         intent.putExtra("SIZE", size);

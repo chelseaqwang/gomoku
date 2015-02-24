@@ -39,7 +39,7 @@ public class Offline extends PlayIF {
         Player player;
         float x = m.getX();
         float y = m.getY();
-        float grid = 800/size;
+        float grid = 1200/size;
         float radius;
         int i, j;
 
@@ -64,6 +64,7 @@ public class Offline extends PlayIF {
         button_play_again.setOnClickListener (
                 new Button.OnClickListener() {
                     public void onClick(View v) {
+                        Offline.this.finish();
                         Intent intent = new Intent(Offline.this, Offline.class);
                         intent.putExtra("SIZE", size);
                         startActivity(intent);

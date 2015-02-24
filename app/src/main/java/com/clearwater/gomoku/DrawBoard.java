@@ -19,11 +19,11 @@ public class DrawBoard extends View {
     public void onDraw(Canvas canvas) {
         paint.setStrokeWidth(5);
         paint.setColor(Color.BLACK);
-        float padding = 800/size/2;
+        float padding = 1200/size/2;
 
-        for (float i = padding; i < 800; i+=800/size) {
-            canvas.drawLine(padding, i, 800-padding, i, paint);
-            canvas.drawLine(i, padding, i, 800-padding, paint);
+        for (float i = padding; i < 1200; i+=1200/size) {
+            canvas.drawLine(padding, i, 1200-padding, i, paint);
+            canvas.drawLine(i, padding, i, 1200-padding, paint);
         }
 
     }

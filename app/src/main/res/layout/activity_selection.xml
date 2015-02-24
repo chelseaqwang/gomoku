@@ -51,7 +51,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginTop="500dp">
         <RadioButton
-            android:layout_width="190dp"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:text="@string/button_mode_offline"
             android:id="@+id/button_offline"
@@ -62,13 +62,6 @@
             android:layout_height="wrap_content"
             android:text="@string/button_mode_ai"
             android:id="@+id/button_ai"
-            android:checked="false"
-            android:textSize="20sp" />
-        <RadioButton
-            android:layout_width="190dp"
-            android:layout_height="wrap_content"
-            android:text="@string/button_mode_online"
-            android:id="@+id/button_online"
             android:checked="false"
             android:textSize="20sp" />
     </RadioGroup>
