@@ -57,7 +57,7 @@
         android:id="@+id/button_host"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="500dp"
+        android:layout_marginTop="350dp"
         android:textSize="30sp"
         android:layout_alignParentEnd="false"
         android:clickable="false" />
