@@ -73,7 +73,6 @@ public class BT_host extends PlayIF {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         TextView textView = (TextView)findViewById(R.id.winText);
-
         // 1. initialize BlueTooth
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -88,9 +87,21 @@ public class BT_host extends PlayIF {
         }
 
         // 2. waiting for player to join
-        mHostAcceptThread = new AcceptThread();
-        mHostAcceptThread.start();
-
+        BluetoothServerSocket mmServerSocket;
+        BluetoothSocket socket;
+        try {
+            // MY_UUID is the app's UUID string, also used by the client code
+            mmServerSocket = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(GOMOKU_BT_NAME, GOMOKU_BT_UUID);
+            socket = mmServerSocket.accept();
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+        drawBoard = new DrawBoard(this, size);
+        addContentView(drawBoard,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        System.out.println("acceptThread::run hostDrawBoard() finished.");
+//        TextView textView = (TextView)findViewById(R.id.winText);
+        textView.setText("Host connected");
 
 
         setPlayer();
@@ -178,7 +189,7 @@ public class BT_host extends PlayIF {
 //                    manageConnectedSocket(socket);
 
                     setContentView(R.layout.activity_board);
-                    System.out.println("xxxxxxxxx.")
+                    System.out.println("xxxxxxxxx.");
                     Context context = getApplicationContext();
                     drawBoard = new DrawBoard(context, size);
                     addContentView(drawBoard,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,

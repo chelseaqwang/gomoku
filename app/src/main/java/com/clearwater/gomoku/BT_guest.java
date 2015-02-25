@@ -74,6 +74,8 @@ public class BT_guest extends PlayIF {
 
             mGuestConnectThread = new ConnectThread(host_device);
             mGuestConnectThread.start();
+            textView.setText("Guest connected.");
+
             
             // Create the result Intent and include the MAC address
  //           Intent intent = new Intent();
@@ -214,7 +216,7 @@ public class BT_guest extends PlayIF {
             mBluetoothAdapter.cancelDiscovery();
 
             try {
-                textView.setText("ConnectThread:Run.");
+//                textView.setText("ConnectThread:Run.");
 
                 // Connect the device through the socket. This will block
                 // until it succeeds or throws an exception
@@ -226,6 +228,7 @@ public class BT_guest extends PlayIF {
                 } catch (IOException closeException) { }
                 return;
             }
+
 
             // Do work to manage the connection (in a separate thread)
             //manageConnectedSocket(mmSocket);
