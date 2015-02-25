@@ -18,7 +18,8 @@ public class AI extends PlayIF {
     public void play(MotionEvent m) {
         float x = m.getX();
         float y = m.getY();
-        float grid = 1200/size;
+        int width = getResources().getDisplayMetrics().widthPixels;
+        float grid = width/size;
         float radius;
         int i, j;
 
