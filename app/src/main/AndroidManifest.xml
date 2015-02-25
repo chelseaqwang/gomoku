@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.clearwater.gomoku" >
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -62,6 +65,16 @@
         <activity
             android:name=".Online"
             android:label="Online"
+            android:parentActivityName=".Mainmenu" >
+        </activity>
+        <activity
+            android:name=".BT_host"
+            android:label="BT_host"
+            android:parentActivityName=".Mainmenu" >
+        </activity>
+        <activity
+            android:name=".BT_guest"
+            android:label="BT_guest"
             android:parentActivityName=".Mainmenu" >
         </activity>
         <activity
