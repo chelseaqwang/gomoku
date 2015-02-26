@@ -39,7 +39,8 @@ public class Offline extends PlayIF {
         Player player;
         float x = m.getX();
         float y = m.getY();
-        float grid = 1200/size;
+        int width = getResources().getDisplayMetrics().widthPixels;
+        float grid = width/size;
         float radius;
         int i, j;
 
