@@ -9,7 +9,11 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,60 +50,30 @@ import android.widget.Toast;
  * *
  */
 public class BT_guest extends PlayIF {
-    public static String HOST_DEVICE_MAC = "host_device_address";
+    private static final String TAG = "BT_Gomoku";
+    private static final boolean D = true;
 
-    /**
-     * The on-click listener for all devices in the ListViews
-     */
-    private AdapterView.OnItemClickListener mDeviceClickListener
-            = new AdapterView.OnItemClickListener() {
-        public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
-            // Cancel discovery because it's costly and we're about to connect
-            mBluetoothAdapter.cancelDiscovery();
+    // Key names received from the BluetoothChatService Handler
+    public static final String DEVICE_NAME = "device_name";
+    public static final String TOAST = "toast";
 
-            // Get the device MAC address, which is the last 17 chars in the View
-            String info = ((TextView) v).getText().toString();
-            String address = info.substring(info.length() - 17);
+    // Message types sent from the BluetoothChatService Handler
+    public static final int MESSAGE_STATE_CHANGE = 1;
+    public static final int MESSAGE_READ = 2;
+    public static final int MESSAGE_WRITE = 3;
+    public static final int MESSAGE_DEVICE_NAME = 4;
+    public static final int MESSAGE_TOAST = 5;
 
-            HOST_DEVICE_MAC = address;
-
-            TextView textView = (TextView)findViewById(R.id.winText);
-            textView.setText("Going to connect with " + HOST_DEVICE_MAC);
-
-            myListView = (ListView)findViewById(R.id.listView1);
-            myListView.setVisibility(View.GONE);
-
-            // Get the BluetoothDevice object
-            BluetoothDevice host_device = mBluetoothAdapter.getRemoteDevice(address);
-
-            mGuestConnectThread = new ConnectThread(host_device);
-            mGuestConnectThread.start();
-            textView.setText("Guest connected.");
-
-            
-            // Create the result Intent and include the MAC address
- //           Intent intent = new Intent();
-   //         intent.putExtra(HOST_DEVICE_MAC, address);
-
-            // Set result and finish this Activity
- //           setResult(Activity.RESULT_OK, intent);
-  //          finish();
-        }
-    };
-
-    private static final int REQUEST_ENABLE_BT = 1;
+    protected Context context;
+    private String connectedDeviceName;
+    private BT_service mBTService;
     private BluetoothAdapter mBluetoothAdapter;
-    private Set<BluetoothDevice> pairedDevices;
-    private ArrayAdapter<String> mArrayAdapter;
-
-    private ListView myListView;
-
-    private static final String GOMOKU_BT_NAME = "BluetoothGomoku";
-    private static final UUID GOMOKU_BT_UUID =
-            UUID.fromString("69280706-491c-448d-a96d-dbf107a45f2e");
-
-    private ConnectThread mGuestConnectThread;
-
+  
+    // Intent request codes
+    private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
+    private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
+    private static final int REQUEST_ENABLE_BT = 3;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,142 +82,177 @@ public class BT_guest extends PlayIF {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        TextView textView = (TextView)findViewById(R.id.winText);
-
-        // 1. Initialize BlueTooth
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            // Device does not support Bluetooth
-            textView.setText("Device does not support Bluetooth!");
-            return;
-        }
-
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-
-        // 2. Let the user choose which device to connect from the paired list
-        pairedDevices = mBluetoothAdapter.getBondedDevices();
-        mArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-
-        // If there are paired devices
-        if (pairedDevices.size() > 0) {
-            textView.setText("Please select");
-            // Loop through paired devices
-            for (BluetoothDevice device : pairedDevices) {
-                // Add the name and address to an array adapter to show in a ListView
-                mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-            }
-        } else {
-            textView.setText("no paired devices");
-        }
-
-        myListView = (ListView)findViewById(R.id.listView1);
-        myListView.setAdapter(mArrayAdapter);
-        myListView.setOnItemClickListener(mDeviceClickListener);
-
-       // Get the BluetoothDevice object
-//        String address = HOST_DEVICE_MAC;
-//        BluetoothDevice host_device = mBluetoothAdapter.getRemoteDevice(address);
-        
-//        mGuestConnectThread = new ConnectThread(host_device);
-//        mGuestConnectThread.start();
-
-        // 1. Initialize the board, size should be get from Host
-//        Intent intent = getIntent();
-//        size = intent.getIntExtra("SIZE", 10);
-//        move = new char[size][size];
-
-//        drawBoard = new DrawBoard(this, size);
-        //   addContentView(drawBoard,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-        //            ViewGroup.LayoutParams.MATCH_PARENT));
-
         setPlayer();
 
-        // 3. wait player to join
-        //    textView.setText(player1.name + " vs. " + player2.name);
+        TextView textView = (TextView)findViewById(R.id.winText);
+        textView.setVisibility(View.INVISIBLE);
+        
+        //1. Right after enter the main activity of BT_guest, check whether BT is available
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        // If the adapter is null, then Bluetooth is not supported, in which case we will quit
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
+            this.finish();
+        }
+    }
 
-        // 4. Main play loop
+    @Override
+    public void onStart() {
+        super.onStart();
 
+        //2. Check whether BT is enabled
 
-
-/*
-        //bobo: xxx play loop
-        drawBoard.setOnTouchListener(
-                new DrawBoard.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent m) {
-                        play(m);
-                        return true;
+        // If BT is not on, request that it be enabled.
+        // setupBTService() will then be called during onActivityResult
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+            // Otherwise, setup the chat session
+        } else if (mBTService == null) {
+            setupBTService();
+        }
+        
+        // 3. Set up the button for guest to scan and connect to host, which will be handled
+        //    by a new activity "BT_DeviceListActivity". This activity will return the host
+        //    device MAC address
+        // Make the button of "connect to host" be visible and if it is clicked
+        Button button_guest_scan = (Button)findViewById(R.id.guest_scan);
+        button_guest_scan.setVisibility(View.VISIBLE);
+        button_guest_scan.setOnClickListener (
+                new Button.OnClickListener() {
+                    public void onClick(View v) {
+                        Intent serverIntent = new Intent(BT_guest.this, BT_DeviceListActivity.class);
+                        startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
                     }
                 }
         );
-        */
     }
 
-    private class ConnectThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final BluetoothDevice mmDevice;
-
-        public ConnectThread(BluetoothDevice device) {
-            TextView textView = (TextView)findViewById(R.id.winText);
-
-            // Use a temporary object that is later assigned to mmSocket,
-            // because mmSocket is final
-            BluetoothSocket tmp = null;
-            mmDevice = device;
-
-            // Get a BluetoothSocket to connect with the given BluetoothDevice
-            try {
-                // MY_UUID is the app's UUID string, also used by the server code
-                tmp = device.createRfcommSocketToServiceRecord(GOMOKU_BT_UUID);
-                
-                if(tmp != null) {
-                    textView.setText("ConnectThread:: host found.");
-                } else {
-                    textView.setText("ConnectThread:: host not found.");
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CONNECT_DEVICE_SECURE:
+                System.out.println("BT_guest::onActivityResult() REQUEST_CONNECT_DEVICE_SECURE: ");
+                // When DeviceListActivity returns with a device to connect
+                if (resultCode == Activity.RESULT_OK) {
+                    System.out.println("RESULT_OK\n");
+                    connectDevice(data, true);
                 }
-            } catch (IOException e) { }
-            mmSocket = tmp;
-        }
-
-        public void run() {
-            TextView textView = (TextView)findViewById(R.id.winText);
-
-            // Cancel discovery because it will slow down the connection
-            mBluetoothAdapter.cancelDiscovery();
-
-            try {
-//                textView.setText("ConnectThread:Run.");
-
-                // Connect the device through the socket. This will block
-                // until it succeeds or throws an exception
-                mmSocket.connect();
-            } catch (IOException connectException) {
-                // Unable to connect; close the socket and get out
-                try {
-                    mmSocket.close();
-                } catch (IOException closeException) { }
-                return;
-            }
-
-
-            // Do work to manage the connection (in a separate thread)
-            //manageConnectedSocket(mmSocket);
- //           textView.setText("ConnectThread::run will return.");
-
-        }
-
-        /** Will cancel an in-progress connection, and close the socket */
-        public void cancel() {
-            try {
-                mmSocket.close();
-            } catch (IOException e) { }
+                break;
+            case REQUEST_CONNECT_DEVICE_INSECURE:
+                // When DeviceListActivity returns with a device to connect
+                if (resultCode == Activity.RESULT_OK) {
+                    connectDevice(data, false);
+                }
+                break;
+            case REQUEST_ENABLE_BT:
+                // When the request to enable Bluetooth returns
+                if (resultCode == Activity.RESULT_OK) {
+                    // Bluetooth is now enabled, so set up a chat session
+                    setupBTService();
+                } else {
+                    // User did not enable Bluetooth or an error occurred
+                    Toast.makeText(this, R.string.bt_not_enabled_leaving,
+                            Toast.LENGTH_SHORT).show();
+                    this.finish();
+                }
         }
     }
 
+    private void setupBTService() {
+
+        context = getApplicationContext();
+        mBTService = new BT_service(context, mHandler);
+    }
+
+
+    protected final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MESSAGE_STATE_CHANGE:
+                    if (D) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                    switch (msg.arg1) {
+                        case BT_service.STATE_CONNECTED:
+                            //TODO: Tell the game that the connection was established
+                            break;
+                        case BT_service.STATE_CONNECTING:
+                            //TODO: Tell the game that it's connecting
+                            break;
+                        case BT_service.STATE_LISTEN:
+                        case BT_service.STATE_NONE:
+                            //TODO: Tell the game that it's not connected
+                            break;
+                    }
+                    break;
+                case MESSAGE_WRITE:
+                    byte[] writeBuf = (byte[]) msg.obj;
+
+                    // construct a string from the buffer
+                    String writeMessage = new String(writeBuf);
+                    //TODO: Handle the message (i.e. wait for the ACK)
+                    break;
+                case MESSAGE_READ:
+                    byte readChar = (byte) msg.obj;
+
+                    //Toast.makeText(context, new String(readBuf), Toast.LENGTH_LONG).show(); //this is test code. Remove when not needed
+
+                    acceptCharacter(readChar);
+
+                    break;
+                case MESSAGE_DEVICE_NAME:
+                    // save the connected device's name
+                    connectedDeviceName = msg.getData().getString(DEVICE_NAME);
+                    Toast.makeText(context, "Connected to "
+                            + connectedDeviceName, Toast.LENGTH_SHORT).show();
+                    break;
+                case MESSAGE_TOAST:
+                    Toast.makeText(context, msg.getData().getString(TOAST),
+                            Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
+
+    protected void acceptCharacter(byte character) {
+    }
+
+    private void hostDrawBoard() {
+        // 3. Initialize the board
+        Intent intent = getIntent();
+        size = intent.getIntExtra("SIZE", 10);
+        move = new char[size][size];
+
+        drawBoard = new DrawBoard(this, size);
+
+        addContentView(drawBoard,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+    }
+
+    /**
+     * Establish connection with other divice
+     *
+     * @param data   An {@link Intent} with {@link BT_DeviceListActivity#EXTRA_DEVICE_ADDRESS} extra.
+     * @param secure Socket Security type - Secure (true) , Insecure (false)
+     */
+    private void connectDevice(Intent data, boolean secure) {
+        // Get the device MAC address
+        String address = data.getExtras()
+                .getString(BT_DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+        // Get the BluetoothDevice object
+        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+
+        TextView textView = (TextView)findViewById(R.id.winText);
+        textView.setText("Host MAC: " + address);
+        textView.setVisibility(View.VISIBLE);
+        
+        //BOBO: xxx start the attempt to connect to host here
+        // Attempt to connect to the device
+        System.out.println("BT_guest::connectDevice is invoked, before connect.");
+        mBTService.connect(device, secure);
+        System.out.println("BT_guest::connectDevice is invoked, after connect.");
+    }
+    
     public void setPlayer() {
         player1 = new Player("Peter", Color.BLACK);
         player2 = new Player("Jean", Color.WHITE);

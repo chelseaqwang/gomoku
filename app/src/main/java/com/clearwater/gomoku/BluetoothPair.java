@@ -52,3 +52,4 @@ public class BluetoothPair extends ActionBarActivity {
     }
 
 }
+
