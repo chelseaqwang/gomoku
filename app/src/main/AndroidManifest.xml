@@ -81,6 +81,10 @@
             android:name=".BluetoothPair"
             android:label="@string/title_activity_bluetooth_pair" >
         </activity>
+        <activity
+            android:name=".BT_DeviceListActivity"
+            android:label="@string/title_activity_bt__device_list" >
+        </activity>
     </application>
 
 </manifest>

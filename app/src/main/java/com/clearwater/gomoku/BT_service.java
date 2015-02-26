@@ -130,7 +130,7 @@ public class BT_service {
      * @param secure Socket Security type - Secure (true) , Insecure (false)
      */
     public synchronized void connect(BluetoothDevice device, boolean secure) {
-        Log.d(TAG, "connect to: " + device);
+      //  Log.d(TAG, "connect to: " + device);
 
         // Cancel any thread attempting to make a connection
         if (mState == STATE_CONNECTING) {
@@ -146,6 +146,8 @@ public class BT_service {
             mConnectedThread = null;
         }
 
+        System.out.println("BT_service::connect is invoked!");
+        
         // Start the thread to connect with the given device
         mConnectThread = new ConnectThread(device, secure);
         mConnectThread.start();
