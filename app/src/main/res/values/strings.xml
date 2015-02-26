@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Gomoku</string>
+    <string name="app_name">Gomoku＋</string>
     <string name="back">back to main menu</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_mainmenu">main</string>
-    <string name="button_offline">OFFLINE</string>
+    <string name="button_offline">STANDALONE   </string>
     <string name="button_online">ONLINE</string>
     <string name="button_profile">PROFILE</string>
     <string name="button_statistics">STATISTICS</string>
