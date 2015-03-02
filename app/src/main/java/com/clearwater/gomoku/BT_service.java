@@ -1,7 +1,18 @@
 package com.clearwater.gomoku;
-
-/**
- * Created by chenbo on 2/25/15.
+/*
+ * Copyright (C) 2014 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import android.bluetooth.BluetoothAdapter;
@@ -12,16 +23,25 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import android.util.Log;
+
+
+
+/**
+ * This class does all the work for setting up and managing Bluetooth
+ * connections with other devices. It has a thread that listens for
+ * incoming connections, a thread for connecting with a device, and a
+ * thread for performing data transmissions when connected.
+ */
 public class BT_service {
     // Debugging
-    private static final String TAG = "BluetoothChatService";
+    private static final String TAG = "BT_service";
 
     // Name for the SDP record when creating server socket
     private static final String NAME_SECURE = "BluetoothChatSecure";
@@ -31,24 +51,13 @@ public class BT_service {
     private static final UUID MY_UUID_SECURE =
             UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
     private static final UUID MY_UUID_INSECURE =
-            UUID.fromString("69280706-491c-448d-a96d-dbf107a45f2e");
-
-    // Message types sent from the BluetoothChatService Handler
-    public static final int MESSAGE_STATE_CHANGE = 1;
-    public static final int MESSAGE_READ = 2;
-    public static final int MESSAGE_WRITE = 3;
-    public static final int MESSAGE_DEVICE_NAME = 4;
-    public static final int MESSAGE_TOAST = 5;
-
-    // Key names received from the BluetoothChatService Handler
-    public static final String DEVICE_NAME = "device_name";
-    public static final String TOAST = "toast";
+            UUID.fromString("69280706-491c-448d-a96d-dbf107a45f2");
 
     // Member fields
-    private final BluetoothAdapter adapter;
-    private final Handler handler;
-    private AcceptThread secureAcceptThread;
-    private AcceptThread insecureAcceptThread;
+    private final BluetoothAdapter mAdapter;
+    private final Handler mHandler;
+    private AcceptThread mSecureAcceptThread;
+    private AcceptThread mInsecureAcceptThread;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private int mState;
@@ -66,9 +75,9 @@ public class BT_service {
      * @param handler A Handler to send messages back to the UI Activity
      */
     public BT_service(Context context, Handler handler) {
-        adapter = BluetoothAdapter.getDefaultAdapter();
+        mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
-        this.handler = handler;
+        mHandler = handler;
     }
 
     /**
@@ -81,7 +90,7 @@ public class BT_service {
         mState = state;
 
         // Give the new state to the Handler so the UI Activity can update
-        handler.obtainMessage(MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
+        mHandler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
     }
 
     /**
@@ -113,13 +122,13 @@ public class BT_service {
         setState(STATE_LISTEN);
 
         // Start the thread to listen on a BluetoothServerSocket
-        if (secureAcceptThread == null) {
-            secureAcceptThread = new AcceptThread(true);
-            secureAcceptThread.start();
+        if (mSecureAcceptThread == null) {
+            mSecureAcceptThread = new AcceptThread(true);
+            mSecureAcceptThread.start();
         }
-        if (insecureAcceptThread == null) {
-            insecureAcceptThread = new AcceptThread(false);
-            insecureAcceptThread.start();
+        if (mInsecureAcceptThread == null) {
+            mInsecureAcceptThread = new AcceptThread(false);
+            mInsecureAcceptThread.start();
         }
     }
 
@@ -130,7 +139,7 @@ public class BT_service {
      * @param secure Socket Security type - Secure (true) , Insecure (false)
      */
     public synchronized void connect(BluetoothDevice device, boolean secure) {
-      //  Log.d(TAG, "connect to: " + device);
+        Log.d(TAG, "connect to: " + device);
 
         // Cancel any thread attempting to make a connection
         if (mState == STATE_CONNECTING) {
@@ -146,8 +155,6 @@ public class BT_service {
             mConnectedThread = null;
         }
 
-        System.out.println("BT_service::connect is invoked!");
-        
         // Start the thread to connect with the given device
         mConnectThread = new ConnectThread(device, secure);
         mConnectThread.start();
@@ -177,13 +184,13 @@ public class BT_service {
         }
 
         // Cancel the accept thread because we only want to connect to one device
-        if (secureAcceptThread != null) {
-            secureAcceptThread.cancel();
-            secureAcceptThread = null;
+        if (mSecureAcceptThread != null) {
+            mSecureAcceptThread.cancel();
+            mSecureAcceptThread = null;
         }
-        if (insecureAcceptThread != null) {
-            insecureAcceptThread.cancel();
-            insecureAcceptThread = null;
+        if (mInsecureAcceptThread != null) {
+            mInsecureAcceptThread.cancel();
+            mInsecureAcceptThread = null;
         }
 
         // Start the thread to manage the connection and perform transmissions
@@ -191,11 +198,11 @@ public class BT_service {
         mConnectedThread.start();
 
         // Send the name of the connected device back to the UI Activity
-        Message msg = handler.obtainMessage(MESSAGE_DEVICE_NAME);
+        Message msg = mHandler.obtainMessage(Constants.MESSAGE_DEVICE_NAME);
         Bundle bundle = new Bundle();
-        bundle.putString(DEVICE_NAME, device.getName());
+        bundle.putString(Constants.DEVICE_NAME, device.getName());
         msg.setData(bundle);
-        handler.sendMessage(msg);
+        mHandler.sendMessage(msg);
 
         setState(STATE_CONNECTED);
     }
@@ -216,14 +223,14 @@ public class BT_service {
             mConnectedThread = null;
         }
 
-        if (secureAcceptThread != null) {
-            secureAcceptThread.cancel();
-            secureAcceptThread = null;
+        if (mSecureAcceptThread != null) {
+            mSecureAcceptThread.cancel();
+            mSecureAcceptThread = null;
         }
 
-        if (insecureAcceptThread != null) {
-            insecureAcceptThread.cancel();
-            insecureAcceptThread = null;
+        if (mInsecureAcceptThread != null) {
+            mInsecureAcceptThread.cancel();
+            mInsecureAcceptThread = null;
         }
         setState(STATE_NONE);
     }
@@ -251,11 +258,11 @@ public class BT_service {
      */
     private void connectionFailed() {
         // Send a failure message back to the Activity
-        Message msg = handler.obtainMessage(MESSAGE_TOAST);
+        Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
-        bundle.putString(TOAST, "Unable to connect device");
+        bundle.putString(Constants.TOAST, "Unable to connect device");
         msg.setData(bundle);
-        handler.sendMessage(msg);
+        mHandler.sendMessage(msg);
 
         // Start the service over to restart listening mode
         BT_service.this.start();
@@ -266,11 +273,11 @@ public class BT_service {
      */
     private void connectionLost() {
         // Send a failure message back to the Activity
-        Message msg = handler.obtainMessage(MESSAGE_TOAST);
+        Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
-        bundle.putString(TOAST, "Device connection was lost");
+        bundle.putString(Constants.TOAST, "Device connection was lost");
         msg.setData(bundle);
-        handler.sendMessage(msg);
+        mHandler.sendMessage(msg);
 
         // Start the service over to restart listening mode
         BT_service.this.start();
@@ -293,10 +300,10 @@ public class BT_service {
             // Create a new listening server socket
             try {
                 if (secure) {
-                    tmp = adapter.listenUsingRfcommWithServiceRecord(NAME_SECURE,
+                    tmp = mAdapter.listenUsingRfcommWithServiceRecord(NAME_SECURE,
                             MY_UUID_SECURE);
                 } else {
-                    tmp = adapter.listenUsingInsecureRfcommWithServiceRecord(
+                    tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(
                             NAME_INSECURE, MY_UUID_INSECURE);
                 }
             } catch (IOException e) {
@@ -397,7 +404,7 @@ public class BT_service {
             setName("ConnectThread" + mSocketType);
 
             // Always cancel discovery because it will slow down a connection
-            adapter.cancelDiscovery();
+            mAdapter.cancelDiscovery();
 
             // Make a connection to the BluetoothSocket
             try {
@@ -464,25 +471,17 @@ public class BT_service {
         public void run() {
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
-            byte[] readChar = new byte[1];
-            int offset = 0;
+            int bytes;
 
             // Keep listening to the InputStream while connected
             while (true) {
                 try {
                     // Read from the InputStream
-                    // Try to read a single character from the input stream
-                    offset = mmInStream.read(readChar, 0, 1);
+                    bytes = mmInStream.read(buffer);
 
-                    // if something was read, send it to the state machine
-                    if (offset > 0) {
-                        // parser will process the input and [if appropriate]
-                        // call the listener's callback method
-                        // Send the obtained bytes to the UI Activity
-                        handler.obtainMessage(MESSAGE_READ, 1, -1, readChar[0]) .sendToTarget();
-                    }
-
-
+                    // Send the obtained bytes to the UI Activity
+                    mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
+                            .sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
@@ -491,8 +490,6 @@ public class BT_service {
                     break;
                 }
             }
-
-
         }
 
         /**
@@ -503,11 +500,9 @@ public class BT_service {
         public void write(byte[] buffer) {
             try {
                 mmOutStream.write(buffer);
-                Log.d("Sending",new String(buffer)) ;
-
 
                 // Share the sent message back to the UI Activity
-                handler.obtainMessage(MESSAGE_WRITE, -1, -1, buffer)
+                mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer)
                         .sendToTarget();
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);

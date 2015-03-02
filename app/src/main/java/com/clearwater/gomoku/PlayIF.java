@@ -89,6 +89,13 @@ public abstract class PlayIF extends ActionBarActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
+    /**
+     * Update the status of the program when a new piece is added
+     * THe location of new added piece:
+     *  @param i
+     *  @param j
+     *  @param player, the player who added the piece*
+     */
     protected boolean display(int i, int j, Player player) {
         TextView textView = (TextView)findViewById(R.id.winText);
         Chronometer chronometer = (Chronometer) findViewById(R.id.chronometer);
@@ -114,7 +121,7 @@ public abstract class PlayIF extends ActionBarActivity {
 
     }
 
-    private Boolean checkWin(int i, int j, int color) {
+    protected Boolean checkWin(int i, int j, int color) {
         if (round <= 8) return false;
         StringBuffer s = new StringBuffer();
         for (int p = Math.max(i-5, 0); p < Math.min(i+6, size); p++) {
@@ -144,7 +151,7 @@ public abstract class PlayIF extends ActionBarActivity {
 
     }
 
-    private boolean checkTie() {
+    protected boolean checkTie() {
         if (round < size * size * 0.7) return false;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {

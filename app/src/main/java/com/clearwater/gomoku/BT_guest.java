@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.TextView;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -63,6 +65,7 @@ public class BT_guest extends PlayIF {
     public static final int MESSAGE_WRITE = 3;
     public static final int MESSAGE_DEVICE_NAME = 4;
     public static final int MESSAGE_TOAST = 5;
+    public static final int MESSAGE_GAME_START = 6;
 
     protected Context context;
     private String connectedDeviceName;
@@ -73,7 +76,17 @@ public class BT_guest extends PlayIF {
     private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
     private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
     private static final int REQUEST_ENABLE_BT = 3;
+
+    // Game status
+    private static final int GAME_ST_NORMAL = 0;
+    private static final int GAME_ST_WIN = 1;
+    private static final int GAME_ST_TIE = 2;
     
+    //Indicate whether game start
+    private boolean is_game_start = false;
+    private boolean is_in_turn = false;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,8 +94,6 @@ public class BT_guest extends PlayIF {
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        setPlayer();
 
         TextView textView = (TextView)findViewById(R.id.winText);
         textView.setVisibility(View.INVISIBLE);
@@ -123,10 +134,19 @@ public class BT_guest extends PlayIF {
                 new Button.OnClickListener() {
                     public void onClick(View v) {
                         Intent serverIntent = new Intent(BT_guest.this, BT_DeviceListActivity.class);
-                        startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+                        startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
                     }
                 }
         );
+    }
+
+    public void onDestroy() {
+
+        super.onDestroy();
+        if (mBTService != null) {
+            mBTService.stop();
+        }
+
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -193,18 +213,17 @@ public class BT_guest extends PlayIF {
                     //TODO: Handle the message (i.e. wait for the ACK)
                     break;
                 case MESSAGE_READ:
-                    byte readChar = (byte) msg.obj;
-
-                    //Toast.makeText(context, new String(readBuf), Toast.LENGTH_LONG).show(); //this is test code. Remove when not needed
-
-                    acceptCharacter(readChar);
-
+                    byte[] readBuf = (byte[]) msg.obj;
+                    // construct a string from the valid bytes in the buffer
+                    String readMessage = new String(readBuf, 0, msg.arg1);
+                    handle_message_read(readMessage);
                     break;
                 case MESSAGE_DEVICE_NAME:
                     // save the connected device's name
                     connectedDeviceName = msg.getData().getString(DEVICE_NAME);
                     Toast.makeText(context, "Connected to "
                             + connectedDeviceName, Toast.LENGTH_SHORT).show();
+                    
                     break;
                 case MESSAGE_TOAST:
                     Toast.makeText(context, msg.getData().getString(TOAST),
@@ -214,20 +233,98 @@ public class BT_guest extends PlayIF {
         }
     };
 
-    protected void acceptCharacter(byte character) {
+    //
+    protected void handle_message_read(String str) {
+        System.out.println("BT_guest::handle_message_read()");
+
+        String msg_type = str.substring(str.indexOf("[") + 1, str.indexOf("]"));
+        System.out.println("BT_guest::handle_message_read(): msg_type = " + msg_type);
+
+        // 1. message to start game
+        if(msg_type.equals("game_start") ) {
+            String str_size = str.substring(str.indexOf(" ") + 1);
+            size = Integer.parseInt (str_size);
+            startGameGuest();
+        }
+        /*
+        else if(msg_type.equals("switch_turn") ) {
+            // a. message of switch_turn,  "msg fmt: [switch_turn]"
+            is_in_turn = true;
+
+            TextView textView = (TextView)findViewById(R.id.winText);
+            textView.setText("Your turn!");
+            updateChronometer();
+        }
+        */
+        else if(msg_type.equals("remote_piece") ) {
+            // b. message of remote_piece,  msg fmt: "[remote_piece] (x,y)"
+            // 1. get the value of x y
+            String str_i = str.substring(str.indexOf("(") + 1, str.indexOf(","));
+            String str_j = str.substring(str.indexOf(",") + 1, str.indexOf(")"));
+            int i =  Integer.parseInt( str_i );
+            int j =  Integer.parseInt( str_j );
+
+            // 1. add piece
+            int width = getResources().getDisplayMetrics().widthPixels;
+            float grid = width/size;
+            move[i][j] = player2.getFlag();
+            float radius = (float) (grid*0.9/2);
+            addPiece(i * grid + grid / 2, j * grid + grid / 2, radius, player2.color);
+
+            // 2. checkwin&&checktie and display
+            if (checkWin(i, j, player2.color)) {
+                updateTextView(player2, GAME_ST_WIN);
+                player2.recordWin();
+                gameRoundEnd();
+            } else if (checkTie()) {
+                updateTextView(player2, GAME_ST_TIE);
+                gameRoundEnd();
+            } else {
+                updateTextView(player1, GAME_ST_NORMAL);
+            }
+
+            // 3. switch turn
+            is_in_turn = true;
+
+            TextView textView = (TextView)findViewById(R.id.winText);
+            textView.setText("Your turn!");
+            updateChronometer();
+        }
     }
 
-    private void hostDrawBoard() {
-        // 3. Initialize the board
-        Intent intent = getIntent();
-        size = intent.getIntExtra("SIZE", 10);
+    private void startGameGuest () {
+        //1. set scan button as invisible
+        TextView textView = (TextView)findViewById(R.id.guest_scan);
+        textView.setVisibility(View.INVISIBLE);
+
+        //2. set move and draw board
         move = new char[size][size];
-
         drawBoard = new DrawBoard(this, size);
-
         addContentView(drawBoard,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
+
+        // 3. set up the setOnTouchListener
+        drawBoard.setOnTouchListener(
+                new DrawBoard.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent m) {
+                        if(is_game_start && is_in_turn) {
+                            play(m);
+                        }
+                        return true;
+                    }
+                }
+        );
+        //3. set is_game_start = true and set is_in_turn = false, as host always hold first piece
+        is_game_start = true;
+        is_in_turn = false;
+        setPlayer();
+        
+        //4. display game status
+        updateChronometer();
+        updateTextView(player2, GAME_ST_NORMAL);
     }
+
 
     /**
      * Establish connection with other divice
@@ -246,21 +343,66 @@ public class BT_guest extends PlayIF {
         textView.setText("Host MAC: " + address);
         textView.setVisibility(View.VISIBLE);
         
-        //BOBO: xxx start the attempt to connect to host here
-        // Attempt to connect to the device
-        System.out.println("BT_guest::connectDevice is invoked, before connect.");
         mBTService.connect(device, secure);
-        System.out.println("BT_guest::connectDevice is invoked, after connect.");
     }
     
     public void setPlayer() {
-        player1 = new Player("Peter", Color.BLACK);
-        player2 = new Player("Jean", Color.WHITE);
+        player1 = new Player("Guest", Color.WHITE);
+        player2 = new Player("Host:" + connectedDeviceName, Color.BLACK);
         player1.setOpponent(player2);
         player2.setOpponent(player1);
     } // to be implemented
 
-    public void play(MotionEvent m) {} // to be implemented
+    public void play(MotionEvent m) {
+        System.out.println("BT_guest::play() is invoked");
+
+        //1. get the (x,y)
+        float x = m.getX();
+        float y = m.getY();
+        int width = getResources().getDisplayMetrics().widthPixels;
+        float grid = width/size;
+        float radius;
+        int i, j;
+
+        i = Math.round((x-grid/2)/grid);
+        j = Math.round((y-grid/2)/grid);
+
+        if(!checkIndex(i, j)) return;
+        if (move[i][j] != '\0') return;
+
+        //2. put the piece on host
+        move[i][j] = player1.getFlag();
+        radius = (float) (grid*0.9/2);
+        addPiece(i * grid + grid / 2, j * grid + grid / 2, radius, player1.color);
+
+        //3. send message of (i,j) to guest to sync the board
+        //      msg fmt: [remote_piece] (x,y)
+        String location_msg = "[remote_piece] " +
+                "(" +  Integer.toString(i) + "," + Integer.toString(j) + ")";
+        sendMessage(location_msg);
+        System.out.println(location_msg);
+
+        //4. give out turn and sending turn change message
+        is_in_turn = false;
+        //      msg fmt: [switch_turn]
+        String switch_turn_msg = "[switch_turn]";
+        sendMessage(switch_turn_msg);
+        System.out.println(switch_turn_msg);
+
+        //5. display information and checkwin&&checktie
+        if (checkWin(i, j, player1.color)) {
+            updateTextView(player1, GAME_ST_WIN);
+            player1.recordWin();
+            gameRoundEnd();
+        } else if (checkTie()) {
+            updateTextView(player1, GAME_ST_TIE);
+            gameRoundEnd();
+        } else {
+            updateTextView(player2, GAME_ST_NORMAL);
+        }
+        
+        
+    }
 
     public void addResetButton() {
         Button button_play_again = (Button)findViewById(R.id.button_play_again);
@@ -276,4 +418,61 @@ public class BT_guest extends PlayIF {
                 }
         );
     }
+
+    /**
+     * Sends a message.
+     *
+     * @param message A string of text to send.
+     */
+    private void sendMessage(String message) {
+        // Check that we're actually connected before trying anything
+        if (mBTService.getState() != mBTService.STATE_CONNECTED) {
+            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check that there's actually something to send
+        if (message.length() > 0) {
+            // Get the message bytes and tell the BluetoothChatService to write
+            byte[] send = message.getBytes();
+            mBTService.write(send);
+
+            // Reset out string buffer to zero and clear the edit text field
+            //     mOutStringBuffer.setLength(0);
+            //       mOutEditText.setText(mOutStringBuffer);
+        }
+    }
+
+    protected void updateChronometer() {
+        Chronometer chronometer = (Chronometer) findViewById(R.id.chronometer);
+        chronometer.setVisibility(View.VISIBLE);
+        chronometer.setBase(SystemClock.elapsedRealtime());
+        chronometer.start();
+    }
+
+    protected void updateTextView(Player player, int gm_st) {
+        TextView textView = (TextView)findViewById(R.id.winText);
+
+        switch (gm_st) {
+            case GAME_ST_NORMAL:
+                textView.setText("Waiting for " + player.name + " ...");
+                break;
+            case GAME_ST_WIN:
+                textView.setText("Winner is " + player.name + "!");
+                break;
+            case GAME_ST_TIE:
+                textView.setText("Game is tied !");
+                break;
+        }
+    }
+
+    /*
+    * Cleanup the layout and also reset the related variables to reset the next round of game
+    * * * */
+    protected void gameRoundEnd () {
+        addResetButton();
+    }
+
 }
+
+
