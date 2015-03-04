@@ -1,9 +1,11 @@
 package com.clearwater.gomoku;
 
+import android.content.Context;
 import android.content.Intent;
 import android.view.MotionEvent;
 import android.graphics.Color;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 import java.io.BufferedReader;
@@ -42,7 +44,6 @@ public class Offline extends PlayIF {
         int width = getResources().getDisplayMetrics().widthPixels;
         float grid = width/size;
         float radius;
-        int i, j;
 
         i = Math.round((x-grid/2)/grid);
         j = Math.round((y-grid/2)/grid);
@@ -56,6 +57,17 @@ public class Offline extends PlayIF {
         radius = (float) (grid*0.9/2);
         addPiece(i * grid + grid / 2, j * grid + grid / 2, radius, player.color);
 
+        // Add a red highlight for the piece just placed
+        float hl_radius = (float) (grid*0.95/2);
+        if (drawHighlight != null) {
+            ViewGroup vg = (ViewGroup) (drawHighlight.getParent());
+            vg.removeView(drawHighlight);
+        }
+        Context context = getApplicationContext();
+        drawHighlight = new DrawHighlight(context, i * grid + grid / 2, j * grid + grid / 2, hl_radius, radius);
+        addContentView(drawHighlight,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+
         display(i, j, player);
     }
 
@@ -68,6 +80,8 @@ public class Offline extends PlayIF {
                         Offline.this.finish();
                         Intent intent = new Intent(Offline.this, Offline.class);
                         intent.putExtra("SIZE", size);
+                        intent.putExtra("WIN1", player1.win);
+                        intent.putExtra("WIN2", player2.win);
                         startActivity(intent);
                     }
                 }

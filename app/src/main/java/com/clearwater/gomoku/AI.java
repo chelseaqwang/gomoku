@@ -1,9 +1,11 @@
 package com.clearwater.gomoku;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 public class AI extends PlayIF {
@@ -35,7 +37,11 @@ public class AI extends PlayIF {
         radius = (float) (grid*0.9/2);
         addPiece(i*grid+grid/2, j*grid+grid/2, radius, player1.color);
         Boolean end = display(i, j, player1);
-        if(end) return;
+        if(end) {
+            ViewGroup vg = (ViewGroup) (drawHighlight.getParent());
+            vg.removeView(drawHighlight);
+            return;
+        }
 
         int[] ai = getAIMove();
         if(!checkIndex(ai[0], ai[1])) return;
@@ -45,6 +51,17 @@ public class AI extends PlayIF {
         radius = (float) (grid*0.9/2);
         addPiece(ai[0]*grid+grid/2, ai[1]*grid+grid/2, radius, player2.color);
         display(ai[0], ai[1], player2);
+
+        // Add a red highlight for the piece just placed for AI only
+        float hl_radius = (float) (grid*0.95/2);
+        if (drawHighlight != null) {
+            ViewGroup vg = (ViewGroup) (drawHighlight.getParent());
+            vg.removeView(drawHighlight);
+        }
+        Context context = getApplicationContext();
+        drawHighlight = new DrawHighlight(context, ai[0] * grid + grid / 2, ai[1] * grid + grid / 2, hl_radius, radius);
+        addContentView(drawHighlight,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
     private int getValue(int i,int j){
@@ -397,6 +414,8 @@ public class AI extends PlayIF {
                         AI.this.finish();
                         Intent intent = new Intent(AI.this, AI.class);
                         intent.putExtra("SIZE", size);
+                        intent.putExtra("WIN1", player1.win);
+                        intent.putExtra("WIN2", player2.win);
                         startActivity(intent);
                     }
                 }

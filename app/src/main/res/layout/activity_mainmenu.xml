@@ -81,7 +81,7 @@
             android:textSize="30sp"
             android:layout_marginLeft="50dp"
             android:singleLine="true"
-            android:background="@android:drawable/ic_menu_manage" />
+            android:background="@drawable/button_setting" />
 
         <Button
             android:layout_width="100dp"
@@ -93,8 +93,8 @@
             android:layout_alignStart="@+id/button4"
             android:background="@drawable/exit_button"
             android:layout_marginLeft="50dp"
-            android:singleLine="true"
-            android:backgroundTint="@android:drawable/ic_dialog_dialer" />
+            android:singleLine="true" />
+
     </LinearLayout>
 
     <TextView

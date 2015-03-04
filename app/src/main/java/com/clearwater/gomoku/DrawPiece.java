@@ -2,7 +2,10 @@ package com.clearwater.gomoku;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RadialGradient;
+import android.graphics.Shader;
 import android.view.View;
 
 public class DrawPiece extends View {
@@ -22,8 +25,20 @@ public class DrawPiece extends View {
 
     @Override
     public void onDraw(Canvas canvas) {
+        int gradient = 0xFFE6E6E6;
         paint.setColor(color);
-        canvas.drawCircle(x, y, radius,paint);
+        paint.setStrokeWidth(1);
+        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        paint.setShader(new RadialGradient(x + radius/3, y + radius/3,
+                radius, gradient, color, Shader.TileMode.MIRROR));
+        if (color == Color.BLACK) {
+            paint.setShader(new RadialGradient(x + radius/3, y + radius/3,
+                    radius, gradient, color, Shader.TileMode.MIRROR));;
+        } else {
+            paint.setShader(new RadialGradient(x - radius/3, y - radius/3,
+                    radius, gradient, color, Shader.TileMode.MIRROR));;
+        }
+        canvas.drawCircle(x, y, radius, paint);
 
     }
 }

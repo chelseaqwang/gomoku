@@ -1,5 +1,7 @@
 package com.clearwater.gomoku;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 
 public class Player {
@@ -35,6 +37,7 @@ public class Player {
     }
 
     public void recordWin() {
+
         win++;
     }
 }

@@ -24,6 +24,7 @@
     <string name="title_activity_statistics">Statistics</string>
     <string name="title_activity_board_small">Two Players</string>
     <string name="winText">Black vs. White</string>
+    <string name="turnTxt">Your turn</string>
     <string name="button_start">START</string>
     <string name="title_activity_bluetooth_pair">BluetoothPair</string>
     <string name="hello_world">Hello world!</string>

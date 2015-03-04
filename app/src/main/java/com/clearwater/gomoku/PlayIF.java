@@ -1,7 +1,11 @@
 package com.clearwater.gomoku;
 
 import android.content.Context;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.SystemClock;
+import android.os.Vibrator;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -12,15 +16,19 @@ import android.view.MotionEvent;
 import android.content.Intent;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
+import android.widget.GridLayout;
+import android.widget.GridView;
 import android.widget.TextView;
 import android.graphics.Color;
 
 public abstract class PlayIF extends ActionBarActivity {
-    DrawBoard drawBoard;
-    int size;
+    public DrawBoard drawBoard;
+    public int size;
     public char[][] move;
-    Player player1, player2;
-    int round = 0;
+    public Player player1, player2;
+    public int round = 0;
+    protected int i, j;
+    public DrawHighlight drawHighlight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,13 +42,22 @@ public abstract class PlayIF extends ActionBarActivity {
         size = intent.getIntExtra("SIZE", 10);
         move = new char[size][size];
         setPlayer();
+        player1.win = intent.getIntExtra("WIN1", 0);
+        player2.win = intent.getIntExtra("WIN2", 0);
+
 
         drawBoard = new DrawBoard(this, size);
         addContentView(drawBoard,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
 
+        // initial display
         TextView textView = (TextView)findViewById(R.id.winText);
-        textView.setText(player1.name + " vs. " + player2.name);
+        textView.setText(player1.win + " : " + player2.win);
+        GridLayout grid = (GridLayout)findViewById(R.id.info_grid);
+        grid.setVisibility(View.VISIBLE);
+        Chronometer chronometer = (Chronometer) findViewById(R.id.chronometer);
+        chronometer.setBase(SystemClock.elapsedRealtime());
+        chronometer.start();
 
         drawBoard.setOnTouchListener(
                 new DrawBoard.OnTouchListener() {
@@ -97,25 +114,53 @@ public abstract class PlayIF extends ActionBarActivity {
      *  @param player, the player who added the piece*
      */
     protected boolean display(int i, int j, Player player) {
-        TextView textView = (TextView)findViewById(R.id.winText);
+        TextView winText = (TextView)findViewById(R.id.winText);
+        TextView turnTxt = (TextView)findViewById(R.id.turnTxt);
+        TextView turnTxt2 = (TextView)findViewById(R.id.turnTxt2);
         Chronometer chronometer = (Chronometer) findViewById(R.id.chronometer);
-        chronometer.setVisibility(View.VISIBLE);
+        Chronometer chronometer2 = (Chronometer) findViewById(R.id.chronometer2);
         if (checkWin(i, j, player.color) || checkTie()) {
+            // play an alert sound when game ends
+            try {
+                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+                r.play();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             if (checkWin(i, j, player.color)) {
-                textView.setText(player.name + " wins!");
+                winText.setText(player.getColorName() + " wins!");
                 player.recordWin();
             } else if (checkTie()) {
-                textView.setText("It's a tie!");
+                winText.setText("It's a tie!");
             }
             chronometer.stop();
+            chronometer2.stop();
             chronometer.setVisibility(View.INVISIBLE);
+            chronometer2.setVisibility(View.INVISIBLE);
+            turnTxt.setVisibility(View.INVISIBLE);
+            turnTxt2.setVisibility(View.INVISIBLE);
             drawBoard.setOnTouchListener(null);
             addResetButton();
             return true;
         } else {
-            textView.setText(whoseTurn(round + 1).name + "'s turn");
-            chronometer.setBase(SystemClock.elapsedRealtime());
-            chronometer.start();
+            if (player.color == Color.WHITE) {
+                turnTxt.setVisibility(View.VISIBLE);
+                turnTxt2.setVisibility(View.INVISIBLE);
+                chronometer2.stop();
+                chronometer2.setVisibility(View.INVISIBLE);
+                chronometer.setVisibility(View.VISIBLE);
+                chronometer.setBase(SystemClock.elapsedRealtime());
+                chronometer.start();
+            } else {
+                turnTxt2.setVisibility(View.VISIBLE);
+                turnTxt.setVisibility(View.INVISIBLE);
+                chronometer.stop();
+                chronometer.setVisibility(View.INVISIBLE);
+                chronometer2.setVisibility(View.VISIBLE);
+                chronometer2.setBase(SystemClock.elapsedRealtime());
+                chronometer2.start();
+            }
             return false;
         }
 
