@@ -46,4 +46,7 @@
     <string name="title_connecting">connecting...</string>
     <string name="title_not_connected">not connected</string>
 
+    <string name="gamerule">How games run:\nTwo players play, player vs player (same device or online), player vs AI. Player with Black stone take first turn, switch player`s turns after stone placed. In AI mode, Players automatically signed with black stone and take first turn of the game. In online multiple devices game, the player operate host device automatically signed with black stone and take first turn of the game.
+\n\nHow games finish:\nWhen either player placed exactly 5 adjacent stones in the board, either in direction of Horizontal, Vertical or Oblique, this player win the game. note that 6 or more adjacent stones in the board is not the possible win situation.</string>
+
 </resources>

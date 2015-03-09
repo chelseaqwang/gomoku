@@ -58,7 +58,7 @@
             android:layout_centerHorizontal="true"
             android:textSize="30sp"
             android:singleLine="true"
-            android:background="@drawable/profile" />
+            android:background="@drawable/how" />
 
         <Button
             android:layout_width="100dp"
@@ -69,7 +69,8 @@
             android:textSize="30sp"
             android:layout_marginLeft="50dp"
             android:singleLine="true"
-            android:background="@drawable/statistics" />
+            android:background="@drawable/statistics"
+            android:visibility="invisible" />
 
         <Button
             android:layout_width="100dp"
@@ -81,7 +82,8 @@
             android:textSize="30sp"
             android:layout_marginLeft="50dp"
             android:singleLine="true"
-            android:background="@drawable/button_setting" />
+            android:background="@drawable/button_setting"
+            android:visibility="invisible" />
 
         <Button
             android:layout_width="100dp"
